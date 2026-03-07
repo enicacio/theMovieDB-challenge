@@ -20,6 +20,20 @@ Uma aplicação iOS moderna desenvolvida em **SwiftUI** que permite aos usuário
 
 ---
 
+## 📱 Screenshots
+
+### Tela Home com Busca
+Explore filmes populares em uma interface limpa com busca em tempo real.
+
+![Home Screen](screenshot_home.png)
+
+### Tela de Favoritos
+Gerenciador de filmes salvos com persistência local via Core Data.
+
+![Favorites Screen](screenshot_favorites.png)
+
+---
+
 ## 🏗️ Arquitetura
 
 Implementada com padrão **MVVM** (Model-View-ViewModel) com **Dependency Injection** e **Protocol-based design**:
@@ -102,7 +116,7 @@ MovieDB/
 ### 1. Clonar Repositório
 
 ```bash
-git clone https://github.com/enicacio/theMovieDB-challenge
+git clone https://github.com/seu-usuario/moviedb-ios.git
 cd moviedb-ios
 ```
 
@@ -362,8 +376,16 @@ Este projeto é fornecido como está para fins educacionais.
 
 **Eliane Regina Nicácio Mendes**
 
-- GitHub: [@enicacio](https://github.com/enicacio)
-- Email: eliane.nic@gmail.com
+- GitHub: [@seu-usuario](https://github.com/seu-usuario)
+- Email: seu.email@exemplo.com
+
+---
+
+## 🙏 Agradecimentos
+
+- [TheMovieDB](https://www.themoviedb.org) pela excelente API
+- Apple pela documentação de SwiftUI
+- Comunidade Swift por ferramentas e libraries
 
 ---
 
