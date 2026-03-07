@@ -19,3 +19,38 @@ xcuserdata/
 
 .env
 .env.local
+
+# IDE and Editor files
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Xcode
+Breakpoints_v2.xcbkptlist
+*.playground
+
+# CocoaPods (se usar no futuro)
+Pods/
+Podfile.lock
+
+# Swift Package Manager
+.swiftpm/
+.SPM/
+
+# Carthage (se usar)
+Carthage/
+Cartfile.resolved
+
+# Crash logs
+Cores/
+
+# macOS extras
+.AppleDouble
+.LSOverride
+.icloud
+
+# Temporary files
+*.tmp
+*.bak
