@@ -1,0 +1,56 @@
+Configuration.swift
+MovieDB.xcodeproj/xcuserdata/
+MovieDB.xcodeproj/project.xcworkspace/xcuserdata/
+
+Build/
+DerivedData/
+.build/
+
+xcuserdata/
+*.xcworkspace/
+.DS_Store
+
+.AppleDouble
+.LSOverride
+
+*.dSYM/
+*.ipa
+*.xcarchive
+
+.env
+.env.local
+
+# IDE and Editor files
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Xcode
+Breakpoints_v2.xcbkptlist
+*.playground
+
+# CocoaPods (se usar no futuro)
+Pods/
+Podfile.lock
+
+# Swift Package Manager
+.swiftpm/
+.SPM/
+
+# Carthage (se usar)
+Carthage/
+Cartfile.resolved
+
+# Crash logs
+Cores/
+
+# macOS extras
+.AppleDouble
+.LSOverride
+.icloud
+
+# Temporary files
+*.tmp
+*.bak
