@@ -192,7 +192,7 @@ Ativar relatório de cobertura:
 5. Abra `Report Navigator` (`Cmd + 9`)
 6. Clique em "Test" → "Coverage"
 
-**Cobertura Atual:** 80%+ (18 classes testadas)
+**Cobertura Atual:** 75%+ (18 classes testadas)
 
 ### Estrutura de Testes
 
@@ -235,20 +235,6 @@ Domain Layer (Models, Protocols)
 Data Layer (Repositories, Services)
     ↓
 Presentation Layer (Views, ViewModels)
-```
-
-### Dependency Injection
-
-Sem statics/singletons (política de empresa):
-
-```swift
-// ✅ CORRETO
-init(repository: MovieRepositoryProtocol) {
-    self.repository = repository
-}
-
-// ❌ ERRADO
-let repo = MovieRepository()  // Hard dependency
 ```
 
 ### Protocol-Based Design
@@ -309,24 +295,6 @@ protocol LoggerProtocol {
 
 ---
 
-## 🔐 Segurança
-
-### Proteção de Dados Sensíveis
-
-**`.gitignore` protege:**
-```
-Configuration.swift       # API Key nunca vai para GitHub
-DerivedData/             # Build artifacts
-.DS_Store                # Arquivos do sistema
-```
-
-**Para compartilhar código:**
-1. Remova Configuration.swift do histórico Git
-2. Use variáveis de ambiente em produção
-3. Nunca commite API keys
-
----
-
 ## 📊 Performance
 
 ### Otimizações Implementadas
@@ -339,34 +307,9 @@ DerivedData/             # Build artifacts
 
 ---
 
-## 🐛 Troubleshooting
-
-### Erro: "API Key invalid"
-```
-1. Verifique em Configuration.swift
-2. Confirme se copiou a chave corretamente (sem espaços)
-3. Recompile: Cmd + B
-```
-
-### Erro: "Core Data model mismatch"
-```
-1. Delete build folder: Cmd + Shift + K
-2. Resete simulador: Devices and Simulators → Erase
-3. Recompile e rode: Cmd + R
-```
-
-### Testes falhando após mudança
-```
-1. Limpe derivados: rm -rf ~/Library/Developer/Xcode/DerivedData/*
-2. Recompile: Cmd + B
-3. Rode testes: Cmd + U
-```
-
----
-
 ## 📝 Licença
 
-Este projeto é fornecido como está para fins educacionais.
+Este projeto foi desenvolvido para fins educacionais.
 
 ---
 
@@ -374,16 +317,8 @@ Este projeto é fornecido como está para fins educacionais.
 
 **Eliane Regina Nicácio Mendes**
 
-- GitHub: [@seu-usuario](https://github.com/seu-usuario)
-- Email: seu.email@exemplo.com
-
----
-
-## 🙏 Agradecimentos
-
-- [TheMovieDB](https://www.themoviedb.org) pela excelente API
-- Apple pela documentação de SwiftUI
-- Comunidade Swift por ferramentas e libraries
+- GitHub: [@enicacio](https://github.com/enicacio)
+- Email: eliane.nic@gmail.com
 
 ---
 
@@ -399,15 +334,6 @@ Este projeto é fornecido como está para fins educacionais.
 - [MVVM Pattern](https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93viewmodel)
 - [Dependency Injection](https://en.wikipedia.org/wiki/Dependency_injection)
 - [Protocol-Oriented Programming](https://developer.apple.com/videos/play/wwdc2015/408/)
-
----
-
-## 📞 Suporte
-
-Para questões ou issues:
-1. Verifique a seção [Troubleshooting](#-troubleshooting)
-2. Abra uma issue no GitHub
-3. Entre em contato direto
 
 ---
 
