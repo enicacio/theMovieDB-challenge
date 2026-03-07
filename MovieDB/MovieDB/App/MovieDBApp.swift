@@ -11,9 +11,7 @@ import SwiftUI
 struct MovieDBApp: App {
     var body: some Scene {
         WindowGroup {
-            Text("Coming Soon...")
-                .font(.largeTitle)
-                .foregroundColor(.gray)
+            AppView()
         }
     }
 }

@@ -6,26 +6,21 @@
 //
 //
 
-public import Foundation
-public import CoreData
-
-
-public typealias MovieEntityCoreDataPropertiesSet = NSSet
+import Foundation
+import CoreData
 
 extension MovieEntity {
-
     @nonobjc public class func fetchRequest() -> NSFetchRequest<MovieEntity> {
         return NSFetchRequest<MovieEntity>(entityName: "MovieEntity")
     }
 
-    @NSManaged public var backdropPath: String?
-    @NSManaged public var id: String?
+    @NSManaged public var id: Int32
+    @NSManaged public var title: String?
     @NSManaged public var overview: String?
     @NSManaged public var posterPath: String?
+    @NSManaged public var backdropPath: String?
     @NSManaged public var releaseDate: String?
-    @NSManaged public var title: String?
     @NSManaged public var voteAverage: Double
-
 }
 
 extension MovieEntity : Identifiable {

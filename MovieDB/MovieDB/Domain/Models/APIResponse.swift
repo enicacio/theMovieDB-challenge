@@ -14,16 +14,17 @@ struct MovieResponse: Codable {
     let page: Int
     let totalPages: Int
     let totalResults: Int
+    
     enum CodingKeys: String, CodingKey {
         case results
         case page
         case totalPages = "total_pages"
         case totalResults = "total_results"
     }
-    
-    // MARK: - Genre Response
-    
-    struct GenreResponse: Codable {
-        let genres: [Genre]
-    }
+}
+
+// MARK: - Genre Response
+
+struct GenreResponse: Codable {
+    let genres: [Genre]
 }
