@@ -21,7 +21,7 @@ struct MovieListCell: View {
                 .cornerRadius(6)
             
             // Info
-            VStack(alignment: .leading, spacing: 6) {
+            VStack(alignment: .leading) {
                 Text(movie.title)
                     .font(.headline)
                     .lineLimit(2)
@@ -35,7 +35,7 @@ struct MovieListCell: View {
                         .foregroundColor(.secondary)
                 }
                 
-                if let releaseDate = movie.releaseDate {
+                if let releaseDate = movie.releaseDate, !releaseDate.isEmpty {
                     Text(releaseDate)
                         .font(.caption2)
                         .foregroundColor(.secondary)
@@ -52,24 +52,27 @@ struct MovieListCell: View {
                 Image(systemName: isFavorite ? "heart.fill" : "heart")
                     .foregroundColor(.red)
                     .font(.title3)
-                    .scaleEffect(1.2)
-                    .animation(.spring(response: 0.3), value: isFavorite)
             }
         }
-        .padding(12)
+        .padding()
         .background(Color(.systemBackground))
         .cornerRadius(12)
     }
 }
 
 #Preview {
-    MovieListCell(movie: Movie(
-        id: 1,
-        title: "Test",
-        overview: nil,
-        posterPath: nil,
-        backdropPath: nil,
-        releaseDate: nil,
-        voteAverage: 8.0
-    ), onFavoriteTap: {})
+    MovieListCell(
+        movie: Movie(
+            id: 1,
+            title: "Test Movie",
+            overview: "Test overview",
+            posterPath: nil,
+            backdropPath: nil,
+            releaseDate: "2024-01-01",
+            voteAverage: 8.0,
+            genreIds: []
+        ),
+        onFavoriteTap: {}
+    )
 }
+

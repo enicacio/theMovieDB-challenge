@@ -28,16 +28,18 @@ struct MovieDetailView: View {
                 })
             } else if let movie = viewModel.movie {
                 ScrollView {
-                    VStack(alignment: .leading, spacing: 16) {
+                    VStack(alignment: .leading) {
                         // Backdrop
                         CachedAsyncImage(url: movie.backdropURL)
-                            .frame(height: 250)
+                            .scaledToFill()
+                            .frame(maxWidth: .infinity)
                             .clipped()
                         
-                        VStack(alignment: .leading, spacing: 16) {
+                        // Content
+                        VStack(alignment: .leading) {
                             // Title
-                            HStack(alignment: .top, spacing: 12) {
-                                VStack(alignment: .leading, spacing: 8) {
+                            HStack(alignment: .top) {
+                                VStack(alignment: .leading) {
                                     Text(movie.title)
                                         .font(.title2)
                                         .fontWeight(.bold)
@@ -51,7 +53,6 @@ struct MovieDetailView: View {
                                 
                                 Spacer()
                                 
-                                // Favorite Button
                                 Button(action: {
                                     Task {
                                         await viewModel.toggleFavorite()
@@ -73,7 +74,7 @@ struct MovieDetailView: View {
                                 
                                 Spacer()
                                 
-                                if let releaseDate = movie.releaseDate {
+                                if let releaseDate = movie.releaseDate, !releaseDate.isEmpty {
                                     Text(releaseDate)
                                         .font(.caption)
                                         .foregroundColor(.secondary)
@@ -83,14 +84,13 @@ struct MovieDetailView: View {
                             Divider()
                             
                             // Overview
-                            if let overview = movie.overview {
-                                VStack(alignment: .leading, spacing: 8) {
+                            if let overview = movie.overview, !overview.isEmpty {
+                                VStack(alignment: .leading) {
                                     Text("Overview")
                                         .font(.headline)
                                     
                                     Text(overview)
                                         .font(.body)
-                                        .lineLimit(nil)
                                 }
                             }
                         }
@@ -111,5 +111,7 @@ struct MovieDetailView: View {
 }
 
 #Preview {
-    MovieDetailView(movieId: 550)
+    NavigationStack {
+        MovieDetailView(movieId: 550)
+    }
 }

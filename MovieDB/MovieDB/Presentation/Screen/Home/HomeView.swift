@@ -46,7 +46,7 @@ struct HomeView: View {
                 }
             
             ScrollView {
-                LazyVStack(spacing: 12) {
+                LazyVStack {
                     ForEach(viewModel.movies) { movie in
                         NavigationLink(value: movie.id) {
                             MovieListCell(movie: movie) {
