@@ -110,6 +110,36 @@ struct HomeView: View {
                         }
                         .buttonStyle(.plain)
                     }
+                    
+                    // ✅ NOVO: Load More Button
+                    if !viewModel.isLoadingMore {
+                        Button(action: {
+                            Task {
+                                await viewModel.loadMoreMovies()
+                            }
+                        }) {
+                            HStack {
+                                Image(systemName: "arrow.down")
+                                Text("Carregar Mais Filmes")
+                            }
+                            .frame(maxWidth: .infinity)
+                            .padding()
+                            .background(Color(.systemGray6))
+                            .foregroundColor(.primary)
+                            .cornerRadius(8)
+                        }
+                        .padding()
+                    } else {
+                        HStack {
+                            ProgressView()
+                                .scaleEffect(0.8)
+                            Text("Carregando mais filmes...")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                    }
                 }
                 .padding()
             }

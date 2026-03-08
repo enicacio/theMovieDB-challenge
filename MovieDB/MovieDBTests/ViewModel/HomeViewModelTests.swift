@@ -106,6 +106,335 @@ final class HomeViewModelTests: XCTestCase {
         XCTAssertNotNil(sut.error?.message)
     }
     
+    // MARK: - Load More Movies Pagination Tests
+    func testLoadMoreMoviesIncrementsPageFromOne() async {
+        // Arrange
+        let page1Movies = [
+            Movie(id: 1, title: "Movie 1", overview: nil, posterPath: nil,
+                  backdropPath: nil, releaseDate: nil, voteAverage: 8.0)
+        ]
+        mockMovieRepository.mockMovies = page1Movies
+        await sut.loadPopularMovies()  // Carrega página 1
+        
+        // Assert initial state
+        XCTAssertEqual(sut.currentPage, 1)
+        
+        // Arrange page 2
+        let page2Movies = [
+            Movie(id: 2, title: "Movie 2", overview: nil, posterPath: nil,
+                  backdropPath: nil, releaseDate: nil, voteAverage: 7.5)
+        ]
+        mockMovieRepository.mockMovies = page2Movies
+        
+        // Act
+        await sut.loadMoreMovies()
+        
+        // Assert
+        XCTAssertEqual(sut.currentPage, 2)
+    }
+
+    func testLoadMoreMoviesAppendsNotReplaces() async {
+        // Arrange - Load page 1
+        let page1Movies = [
+            Movie(id: 1, title: "Movie 1", overview: nil, posterPath: nil,
+                  backdropPath: nil, releaseDate: nil, voteAverage: 8.0)
+        ]
+        mockMovieRepository.mockMovies = page1Movies
+        await sut.loadPopularMovies()
+        
+        XCTAssertEqual(sut.movies.count, 1)
+        
+        // Arrange - Page 2
+        let page2Movies = [
+            Movie(id: 2, title: "Movie 2", overview: nil, posterPath: nil,
+                  backdropPath: nil, releaseDate: nil, voteAverage: 7.5),
+            Movie(id: 3, title: "Movie 3", overview: nil, posterPath: nil,
+                  backdropPath: nil, releaseDate: nil, voteAverage: 7.0)
+        ]
+        mockMovieRepository.mockMovies = page2Movies
+        
+        // Act
+        await sut.loadMoreMovies()
+        
+        // Assert - Should have 3 movies total (1 from page 1 + 2 from page 2)
+        XCTAssertEqual(sut.movies.count, 3)
+        XCTAssertEqual(sut.movies[0].id, 1)  // First is from page 1
+        XCTAssertEqual(sut.movies[1].id, 2)  // Then page 2
+        XCTAssertEqual(sut.movies[2].id, 3)
+    }
+
+    func testLoadMoreMoviesMultiplePagesSuccessively() async {
+        // Arrange - Page 1
+        let page1 = [
+            Movie(id: 1, title: "Movie 1", overview: nil, posterPath: nil,
+                  backdropPath: nil, releaseDate: nil, voteAverage: 8.0)
+        ]
+        mockMovieRepository.mockMovies = page1
+        await sut.loadPopularMovies()
+        
+        // Act & Assert - Page 2
+        let page2 = [
+            Movie(id: 2, title: "Movie 2", overview: nil, posterPath: nil,
+                  backdropPath: nil, releaseDate: nil, voteAverage: 7.5)
+        ]
+        mockMovieRepository.mockMovies = page2
+        await sut.loadMoreMovies()
+        
+        XCTAssertEqual(sut.currentPage, 2)
+        XCTAssertEqual(sut.movies.count, 2)
+        
+        // Act & Assert - Page 3
+        let page3 = [
+            Movie(id: 3, title: "Movie 3", overview: nil, posterPath: nil,
+                  backdropPath: nil, releaseDate: nil, voteAverage: 7.0)
+        ]
+        mockMovieRepository.mockMovies = page3
+        await sut.loadMoreMovies()
+        
+        XCTAssertEqual(sut.currentPage, 3)
+        XCTAssertEqual(sut.movies.count, 3)
+    }
+
+    func testLoadMoreMoviesHandlesNetworkError() async {
+        // Arrange - Load initial movies
+        let page1Movies = [
+            Movie(id: 1, title: "Movie 1", overview: nil, posterPath: nil,
+                  backdropPath: nil, releaseDate: nil, voteAverage: 8.0)
+        ]
+        mockMovieRepository.mockMovies = page1Movies
+        await sut.loadPopularMovies()
+        
+        let initialPage = sut.currentPage
+        let initialCount = sut.movies.count
+        
+        // Arrange - Network error
+        mockMovieRepository.mockError = .networkUnavailable
+        
+        // Act
+        await sut.loadMoreMovies()
+        
+        // Assert - Page should not increment on error
+        XCTAssertEqual(sut.currentPage, initialPage)
+        XCTAssertEqual(sut.movies.count, initialCount)  // Filmes não mudam
+        XCTAssertNotNil(sut.error)
+        XCTAssertEqual(sut.error?.message, "Erro ao carregar mais filmes")
+    }
+
+    func testLoadMoreMoviesHandlesTimeoutError() async {
+        // Arrange
+        let page1Movies = [
+            Movie(id: 1, title: "Movie 1", overview: nil, posterPath: nil,
+                  backdropPath: nil, releaseDate: nil, voteAverage: 8.0)
+        ]
+        mockMovieRepository.mockMovies = page1Movies
+        await sut.loadPopularMovies()
+        
+        let initialPage = sut.currentPage
+        mockMovieRepository.mockError = .timedOut
+        
+        // Act
+        await sut.loadMoreMovies()
+        
+        // Assert
+        XCTAssertEqual(sut.currentPage, initialPage)
+        XCTAssertNotNil(sut.error)
+    }
+
+
+    func testLoadMoreMoviesHandlesServerError() async {
+        // Arrange
+        let page1Movies = [
+            Movie(id: 1, title: "Movie 1", overview: nil, posterPath: nil,
+                  backdropPath: nil, releaseDate: nil, voteAverage: 8.0)
+        ]
+        mockMovieRepository.mockMovies = page1Movies
+        await sut.loadPopularMovies()
+        
+        let initialPage = sut.currentPage
+        mockMovieRepository.mockError = .serverError(statusCode: 500)
+        
+        // Act
+        await sut.loadMoreMovies()
+        
+        // Assert
+        XCTAssertEqual(sut.currentPage, initialPage)
+        XCTAssertNotNil(sut.error)
+    }
+    
+    func testLoadMoreMoviesDecrementsPageOnError() async {
+        // Arrange
+        let page1Movies = [
+            Movie(id: 1, title: "Movie 1", overview: nil, posterPath: nil,
+                  backdropPath: nil, releaseDate: nil, voteAverage: 8.0)
+        ]
+        mockMovieRepository.mockMovies = page1Movies
+        await sut.loadPopularMovies()
+        
+        XCTAssertEqual(sut.currentPage, 1)
+        
+        mockMovieRepository.mockError = .networkUnavailable
+        
+        // Act
+        await sut.loadMoreMovies()
+        
+        // Assert - Deve voltar à página 1 após erro
+        XCTAssertEqual(sut.currentPage, 1)
+    }
+
+    func testLoadMoreMoviesSetsIsLoadingMoreFlag() async {
+        // Arrange
+        let movies = [
+            Movie(id: 1, title: "Movie 1", overview: nil, posterPath: nil,
+                  backdropPath: nil, releaseDate: nil, voteAverage: 8.0)
+        ]
+        mockMovieRepository.mockMovies = movies
+        await sut.loadPopularMovies()
+        
+        // Assert initial state
+        XCTAssertFalse(sut.isLoadingMore)
+        
+        // Act & Assert
+        mockMovieRepository.mockMovies = []
+        await sut.loadMoreMovies()
+        
+        // Assert after loading
+        XCTAssertFalse(sut.isLoadingMore)  // Deve ser false após completar
+    }
+
+    func testLoadMoreMoviesEmptyPageStopsLoading() async {
+        // Arrange - Load first page
+        let page1Movies = [
+            Movie(id: 1, title: "Movie 1", overview: nil, posterPath: nil,
+                  backdropPath: nil, releaseDate: nil, voteAverage: 8.0)
+        ]
+        mockMovieRepository.mockMovies = page1Movies
+        await sut.loadPopularMovies()
+        
+        // Arrange - Empty page (último resultado da API)
+        mockMovieRepository.mockMovies = []
+        
+        // Act
+        await sut.loadMoreMovies()
+        
+        // Assert - Deve manter página mas não adicionar filmes
+        XCTAssertEqual(sut.currentPage, 2)
+        XCTAssertEqual(sut.movies.count, 1)  // Apenas o primeiro filme
+        XCTAssertNil(sut.error)
+    }
+
+    func testLoadMoreMoviesPreservesExistingData() async {
+        // Arrange - Load page 1 with specific data
+        let page1Movies = [
+            Movie(id: 1, title: "Movie 1", overview: "Overview 1", posterPath: "/1.jpg",
+                  backdropPath: "/back1.jpg", releaseDate: "2024-01-01", voteAverage: 8.0),
+            Movie(id: 2, title: "Movie 2", overview: "Overview 2", posterPath: "/2.jpg",
+                  backdropPath: "/back2.jpg", releaseDate: "2024-02-01", voteAverage: 7.5)
+        ]
+        mockMovieRepository.mockMovies = page1Movies
+        await sut.loadPopularMovies()
+        
+        // Arrange - Page 2
+        let page2Movies = [
+            Movie(id: 3, title: "Movie 3", overview: nil, posterPath: nil,
+                  backdropPath: nil, releaseDate: nil, voteAverage: 7.0)
+        ]
+        mockMovieRepository.mockMovies = page2Movies
+        
+        // Act
+        await sut.loadMoreMovies()
+        
+        // Assert - Original data should be preserved
+        XCTAssertEqual(sut.movies[0].title, "Movie 1")
+        XCTAssertEqual(sut.movies[0].overview, "Overview 1")
+        XCTAssertEqual(sut.movies[1].title, "Movie 2")
+        XCTAssertEqual(sut.movies[2].title, "Movie 3")
+    }
+
+    func testLoadMoreMoviesClearsErrorOnSuccess() async {
+        // Arrange - Cause an error first
+        mockMovieRepository.mockError = .networkUnavailable
+        await sut.loadPopularMovies()
+        XCTAssertNotNil(sut.error)
+        
+        // Reset repository
+        mockMovieRepository.mockError = nil
+        let movies = [
+            Movie(id: 1, title: "Movie 1", overview: nil, posterPath: nil,
+                  backdropPath: nil, releaseDate: nil, voteAverage: 8.0)
+        ]
+        mockMovieRepository.mockMovies = movies
+        
+        // Act - Try load popular again
+        await sut.loadPopularMovies()
+        
+        // Assert - Error should be cleared
+        XCTAssertNil(sut.error)
+    }
+
+    func testLoadMoreMoviesCalledConsecutively() async {
+        // Arrange - Load page 1
+        let page1 = [
+            Movie(id: 1, title: "Movie 1", overview: nil, posterPath: nil,
+                  backdropPath: nil, releaseDate: nil, voteAverage: 8.0)
+        ]
+        mockMovieRepository.mockMovies = page1
+        await sut.loadPopularMovies()
+        
+        // Act - Load page 2
+        let page2 = [
+            Movie(id: 2, title: "Movie 2", overview: nil, posterPath: nil,
+                  backdropPath: nil, releaseDate: nil, voteAverage: 7.5)
+        ]
+        mockMovieRepository.mockMovies = page2
+        await sut.loadMoreMovies()
+        
+        let page2Count = sut.movies.count
+        
+        // Act - Load page 3 immediately
+        let page3 = [
+            Movie(id: 3, title: "Movie 3", overview: nil, posterPath: nil,
+                  backdropPath: nil, releaseDate: nil, voteAverage: 7.0)
+        ]
+        mockMovieRepository.mockMovies = page3
+        await sut.loadMoreMovies()
+        
+        // Assert - Should have all movies from all pages
+        XCTAssertEqual(sut.movies.count, 3)
+        XCTAssertEqual(sut.currentPage, 3)
+    }
+
+    func testLoadMoreMoviesWithLargePageSize() async {
+        // Arrange - Load page 1 with many movies
+        var page1Movies: [Movie] = []
+        for i in 1...20 {
+            page1Movies.append(
+                Movie(id: i, title: "Movie \(i)", overview: nil, posterPath: nil,
+                      backdropPath: nil, releaseDate: nil, voteAverage: Double(8.0 - Double(i) * 0.1))
+            )
+        }
+        mockMovieRepository.mockMovies = page1Movies
+        await sut.loadPopularMovies()
+        
+        // Arrange - Page 2 with more movies
+        var page2Movies: [Movie] = []
+        for i in 21...40 {
+            page2Movies.append(
+                Movie(id: i, title: "Movie \(i)", overview: nil, posterPath: nil,
+                      backdropPath: nil, releaseDate: nil, voteAverage: Double(8.0 - Double(i) * 0.1))
+            )
+        }
+        mockMovieRepository.mockMovies = page2Movies
+        
+        // Act
+        await sut.loadMoreMovies()
+        
+        // Assert
+        XCTAssertEqual(sut.movies.count, 40)
+        XCTAssertEqual(sut.currentPage, 2)
+        XCTAssertEqual(sut.movies.first?.id, 1)
+        XCTAssertEqual(sut.movies.last?.id, 40)
+    }
+    
     // MARK: - Favorite Toggle Tests
     func testToggleFavoriteSuccess() async {
         // Arrange
