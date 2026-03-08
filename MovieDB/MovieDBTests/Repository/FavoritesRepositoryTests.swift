@@ -133,7 +133,15 @@ final class FavoritesRepositoryTests: XCTestCase {
     
     func testFetchFavoritesWithData() async throws {
         // Arrange
-        let movie = Movie(id: 1, title: "Test", overview: nil, posterPath: nil, backdropPath: nil, releaseDate: nil, voteAverage: 8.0)
+        let movie = Movie(
+            id: 1,
+            title: "Test",
+            overview: "Test overview",
+            posterPath: "/test.jpg",
+            backdropPath: "/back.jpg",
+            releaseDate: "2024-01-01",
+            voteAverage: 8.0
+        )
         try await sut.saveFavorite(movie)
         
         // Act

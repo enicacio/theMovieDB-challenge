@@ -98,9 +98,31 @@ struct HomeView: View {
                     }
                 }
             
+            VStack(spacing: 8) {
+                HStack {
+                    Image(systemName: "star.fill")
+                        .foregroundColor(.yellow)
+                    
+                    Slider(value: $viewModel.minRating, in: 0...10, step: 0.5)
+                    
+                    Text(String(format: "%.1f", viewModel.minRating))
+                        .font(.caption)
+                        .fontWeight(.semibold)
+                        .frame(width: 35)
+                }
+                .padding(.horizontal)
+                
+                Text("Mostrando \(viewModel.filteredMovies.count) de \(viewModel.movies.count) filmes")
+                    .font(.caption2)
+                    .foregroundColor(.secondary)
+                    .frame(maxWidth: .infinity, alignment: .center)
+            }
+            .padding(.vertical, 8)
+            .background(Color(.systemGray6))
+            
             ScrollView {
                 LazyVStack {
-                    ForEach(viewModel.movies) { movie in
+                    ForEach(viewModel.filteredMovies) { movie in
                         NavigationLink(value: movie.id) {
                             MovieListCell(movie: movie) {
                                 Task {
@@ -111,7 +133,6 @@ struct HomeView: View {
                         .buttonStyle(.plain)
                     }
                     
-                    // ✅ NOVO: Load More Button
                     if !viewModel.isLoadingMore {
                         Button(action: {
                             Task {

@@ -653,4 +653,93 @@ final class HomeViewModelTests: XCTestCase {
         XCTAssertEqual(sut.movies.count, 1)
         XCTAssertEqual(sut.movies.first?.title, "Avatar")
     }
+    
+    // MARK: - Rating Filter Tests
+    func testMinRatingInitializesAtZero() {
+        XCTAssertEqual(sut.minRating, 0.0)
+    }
+
+    func testFilteredMoviesReturnsAllWhenMinRatingZero() async {
+        let movies = [
+            Movie(id: 1, title: "Movie 1", overview: nil, posterPath: nil,
+                  backdropPath: nil, releaseDate: nil, voteAverage: 5.0),
+            Movie(id: 2, title: "Movie 2", overview: nil, posterPath: nil,
+                  backdropPath: nil, releaseDate: nil, voteAverage: 8.0)
+        ]
+        mockMovieRepository.mockMovies = movies
+        await sut.loadPopularMovies()
+        
+        XCTAssertEqual(sut.filteredMovies.count, 2)
+    }
+
+    func testFilteredMoviesFiltersAboveMinRating() async {
+        let movies = [
+            Movie(id: 1, title: "Low Rating", overview: nil, posterPath: nil,
+                  backdropPath: nil, releaseDate: nil, voteAverage: 5.0),
+            Movie(id: 2, title: "High Rating", overview: nil, posterPath: nil,
+                  backdropPath: nil, releaseDate: nil, voteAverage: 8.0)
+        ]
+        mockMovieRepository.mockMovies = movies
+        await sut.loadPopularMovies()
+        
+        sut.minRating = 7.0
+        
+        XCTAssertEqual(sut.filteredMovies.count, 1)
+        XCTAssertEqual(sut.filteredMovies.first?.title, "High Rating")
+    }
+
+    func testFilteredMoviesWithHighMinRating() async {
+        let movies = [
+            Movie(id: 1, title: "Movie 1", overview: nil, posterPath: nil,
+                  backdropPath: nil, releaseDate: nil, voteAverage: 6.0),
+            Movie(id: 2, title: "Movie 2", overview: nil, posterPath: nil,
+                  backdropPath: nil, releaseDate: nil, voteAverage: 7.0),
+            Movie(id: 3, title: "Movie 3", overview: nil, posterPath: nil,
+                  backdropPath: nil, releaseDate: nil, voteAverage: 9.0)
+        ]
+        mockMovieRepository.mockMovies = movies
+        await sut.loadPopularMovies()
+        
+        sut.minRating = 8.5
+        
+        XCTAssertEqual(sut.filteredMovies.count, 1)
+        XCTAssertEqual(sut.filteredMovies.first?.id, 3)
+    }
+
+    func testFilteredMoviesEmptyWhenNoMatches() async {
+        let movies = [
+            Movie(id: 1, title: "Low 1", overview: nil, posterPath: nil,
+                  backdropPath: nil, releaseDate: nil, voteAverage: 5.0),
+            Movie(id: 2, title: "Low 2", overview: nil, posterPath: nil,
+                  backdropPath: nil, releaseDate: nil, voteAverage: 6.0)
+        ]
+        mockMovieRepository.mockMovies = movies
+        await sut.loadPopularMovies()
+        
+        sut.minRating = 9.0
+        
+        XCTAssertTrue(sut.filteredMovies.isEmpty)
+    }
+
+    func testRatingFilterWithPaginatedMovies() async {
+        let page1Movies = [
+            Movie(id: 1, title: "Movie 1", overview: nil, posterPath: nil,
+                  backdropPath: nil, releaseDate: nil, voteAverage: 8.0)
+        ]
+        mockMovieRepository.mockMovies = page1Movies
+        await sut.loadPopularMovies()
+        
+        let page2Movies = [
+            Movie(id: 2, title: "Movie 2", overview: nil, posterPath: nil,
+                  backdropPath: nil, releaseDate: nil, voteAverage: 6.0)
+        ]
+        mockMovieRepository.mockMovies = page2Movies
+        await sut.loadMoreMovies()
+        
+        sut.minRating = 7.5
+        
+        XCTAssertEqual(sut.movies.count, 2)
+        XCTAssertEqual(sut.filteredMovies.count, 1)
+        XCTAssertEqual(sut.filteredMovies.first?.id, 1)
+    }
 }

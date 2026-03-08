@@ -23,6 +23,12 @@ final class HomeViewModel: ObservableObject {
     @Published var searchText = ""
     @Published var currentPage = 1
     @Published var isLoadingMore = false
+    @Published var minRating: Double = 0.0
+    
+    // MARK: - Computed property
+    var filteredMovies: [Movie] {
+        movies.filter { $0.voteAverage >= minRating }
+    }
     
     // MARK: - Private Properties
     private let movieRepository: MovieRepositoryProtocol
@@ -130,6 +136,10 @@ final class HomeViewModel: ObservableObject {
         }
         
         isLoadingMore = false
+    }
+    
+    func setMinRating(_ rating: Double) {
+        minRating = rating
     }
     
     // MARK: - Private Methods
