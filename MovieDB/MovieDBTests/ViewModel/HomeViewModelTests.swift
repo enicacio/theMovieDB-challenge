@@ -248,4 +248,80 @@ final class HomeViewModelTests: XCTestCase {
         XCTAssertNil(sut.error)
         XCTAssertEqual(sut.movies.count, 1)
     }
+    
+    // MARK: - Empty Search State Tests
+    func testSearchMoviesEmptyResultShowsEmptyState() async {
+        // Arrange
+        sut.searchText = "nonexistent"  // ← NOVO: Define o texto
+        mockMovieRepository.mockMovies = []
+        
+        // Act
+        await sut.searchMovies(query: "nonexistent")
+        
+        // Assert
+        XCTAssertTrue(sut.movies.isEmpty)
+        XCTAssertFalse(sut.searchText.isEmpty)
+        XCTAssertEqual(sut.searchText, "nonexistent")
+    }
+    
+    func testClearSearchButtonResetsState() {
+        // Arrange
+        sut.searchText = "Avatar"
+        XCTAssertFalse(sut.searchText.isEmpty)
+        
+        // Act
+        sut.searchText = ""
+        
+        // Assert
+        XCTAssertTrue(sut.searchText.isEmpty)
+    }
+
+    
+    func testClearSearchLoadPopularMovies() async {
+        // Arrange
+        let movies = [
+            Movie(id: 1, title: "Movie 1", overview: nil, posterPath: nil,
+                  backdropPath: nil, releaseDate: nil, voteAverage: 8.0)
+        ]
+        mockMovieRepository.mockMovies = movies
+        
+        // Act - Simula clicar no "x" da SearchBar
+        await sut.loadPopularMovies()
+        
+        // Assert
+        XCTAssertEqual(sut.movies.count, 1)
+        XCTAssertTrue(sut.searchText.isEmpty)
+    }
+
+    func testSearchTextChangeOnlySearchesWhenNotEmpty() async {
+        // Arrange
+        let initialMovies = [
+            Movie(id: 1, title: "Movie 1", overview: nil, posterPath: nil,
+                  backdropPath: nil, releaseDate: nil, voteAverage: 8.0)
+        ]
+        mockMovieRepository.mockMovies = initialMovies
+        await sut.loadPopularMovies()
+        
+        // Act - Simula apagar o texto (searchText vira "")
+        sut.searchText = ""
+        
+        XCTAssertTrue(sut.searchText.isEmpty)
+    }
+
+    func testSearchTextChangeSearchesWhenNotEmpty() async {
+        // Arrange
+        let searchResults = [
+            Movie(id: 2, title: "Avatar", overview: nil, posterPath: nil,
+                  backdropPath: nil, releaseDate: nil, voteAverage: 7.8)
+        ]
+        mockMovieRepository.mockMovies = searchResults
+        
+        // Act
+        sut.searchText = "Avatar"
+        await sut.searchMovies(query: "Avatar")
+        
+        // Assert
+        XCTAssertEqual(sut.movies.count, 1)
+        XCTAssertEqual(sut.movies.first?.title, "Avatar")
+    }
 }

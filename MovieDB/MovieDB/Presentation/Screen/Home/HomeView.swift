@@ -10,6 +10,7 @@ import SwiftUI
 struct HomeView: View {
     @StateObject private var viewModel = HomeViewModel()
     @State private var navigationPath = NavigationPath()
+    @State private var isSearching = false
     
     var body: some View {
         NavigationStack(path: $navigationPath) {
@@ -20,8 +21,60 @@ struct HomeView: View {
                     ErrorView(error: error, onRetry: {
                         error.retryAction?()
                     })
-                } else if viewModel.movies.isEmpty {
-                    EmptyStateView(message: "No movies found")
+                } else if viewModel.movies.isEmpty && !viewModel.searchText.isEmpty {
+                    // Busca vazia - mostrar SearchBar + botão
+                    VStack(spacing: 0) {
+                        SearchBar(text: $viewModel.searchText, onClear: {
+                            // Callback quando clica no "x"
+                            Task {
+                                await viewModel.loadPopularMovies()
+                            }
+                        })
+                        .onChange(of: viewModel.searchText) { oldValue, newValue in
+                            Task {
+                                if !newValue.isEmpty {
+                                    await viewModel.searchMovies(query: newValue)
+                                }
+                            }
+                        }
+                            .padding(.vertical, 8)
+                        
+                        ScrollView {
+                            VStack(spacing: 20) {
+                                Spacer()
+                                
+                                Image(systemName: "magnifyingglass")
+                                    .font(.system(size: 48))
+                                    .foregroundColor(.gray)
+                                
+                                Text("Não encontramos filmes com '\(viewModel.searchText)'")
+                                    .font(.caption)
+                                    .foregroundColor(.secondary)
+                                    .multilineTextAlignment(.center)
+                                    .padding(.horizontal, 30)
+                                
+                                Button(action: {
+                                    viewModel.searchText = ""
+                                    Task {
+                                        await viewModel.loadPopularMovies()
+                                    }
+                                }) {
+                                    HStack {
+                                        Image(systemName: "arrow.counterclockwise")
+                                        Text("Limpar Busca")
+                                    }
+                                    .frame(maxWidth: .infinity)
+                                    .padding()
+                                    .background(Color.blue)
+                                    .foregroundColor(.white)
+                                    .cornerRadius(8)
+                                }
+                                .padding(.horizontal, 40)
+                                
+                                Spacer()
+                            }
+                        }
+                    }
                 } else {
                     moviesList
                 }
