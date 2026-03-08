@@ -12,6 +12,10 @@ struct MovieListCell: View {
     let onFavoriteTap: () -> Void
     @State private var isFavorite = false
     
+    private var genreNames: [String] {
+        MovieFormatter.genreNames(from: movie.genreIds)
+    }
+    
     var body: some View {
         HStack(spacing: 12) {
             // Poster
@@ -21,26 +25,48 @@ struct MovieListCell: View {
                 .cornerRadius(6)
             
             // Info
-            VStack(alignment: .leading) {
+            VStack(alignment: .leading, spacing: 8) {
+                // Title
                 Text(movie.title)
                     .font(.headline)
                     .lineLimit(2)
                 
+                // Rating with Label
                 HStack(spacing: 4) {
                     Image(systemName: "star.fill")
                         .foregroundColor(.yellow)
                         .font(.caption)
                     Text(String(format: "%.1f", movie.voteAverage))
                         .font(.caption)
-                        .foregroundColor(.secondary)
+                        .fontWeight(.semibold)
                 }
                 
+                // Release Date with Label
                 if let releaseDate = movie.releaseDate, !releaseDate.isEmpty {
-                    Text(releaseDate)
-                        .font(.caption2)
-                        .foregroundColor(.secondary)
+                    HStack(spacing: 4) {
+                        Image(systemName: "calendar")
+                            .font(.caption)
+                            .foregroundColor(.blue)
+                        Text(releaseDate)
+                            .font(.caption2)
+                            .foregroundColor(.secondary)
+                    }
+                }
+                
+                // Genres with Label
+                if !genreNames.isEmpty {
+                    HStack(spacing: 4) {
+                        Image(systemName: "film.fill")
+                            .font(.caption)
+                            .foregroundColor(.purple)
+                        Text(genreNames.prefix(2).joined(separator: ", "))
+                            .font(.caption2)
+                            .foregroundColor(.secondary)
+                            .lineLimit(1)
+                    }
                 }
             }
+            .frame(maxHeight: 90, alignment: .topLeading)
             
             Spacer()
             
@@ -63,16 +89,19 @@ struct MovieListCell: View {
 #Preview {
     MovieListCell(
         movie: Movie(
-            id: 1,
-            title: "Test Movie",
-            overview: "Test overview",
+            id: 550,
+            title: "Fight Club",
+            overview: "An insomniac office worker and a devil-may-care soapmaker form an underground fight club that evolves into much more.",
             posterPath: nil,
             backdropPath: nil,
-            releaseDate: "2024-01-01",
-            voteAverage: 8.0,
-            genreIds: []
+            releaseDate: "1999-10-15",
+            voteAverage: 8.4,
+            voteCount: 29696,
+            runtime: 139,
+            tagline: nil,
+            status: nil,
+            genreIds: [18, 28]
         ),
         onFavoriteTap: {}
     )
 }
-

@@ -11,7 +11,6 @@ import Foundation
 final class MovieDetailViewModel: ObservableObject {
     // MARK: - Published Properties
     @Published var movie: Movie?
-    @Published var genres: [Genre] = []
     @Published var isLoading = false
     @Published var error: ErrorMessage?
     @Published var isFavorite = false
@@ -20,14 +19,6 @@ final class MovieDetailViewModel: ObservableObject {
     private let movieRepository: MovieRepositoryProtocol
     private let favoritesRepository: FavoritesRepositoryProtocol
     private let movieId: Int
-    
-    // MARK: - Computed Properties
-    var genreNames: [String] {
-        guard let genreIds = movie?.genreIds else { return [] }
-        return genres
-            .filter { genreIds.contains($0.id) }
-            .map { $0.name }
-    }
     
     // MARK: - Initialization
     init(
@@ -57,21 +48,6 @@ final class MovieDetailViewModel: ObservableObject {
             let genericError = NetworkError.unknown
             handleError(genericError, context: "LoadMovieDetails") {
                 Task { await self.loadMovieDetails() }
-            }
-        }
-    }
-    
-    func loadGenres() async {
-        do {
-            genres = try await movieRepository.fetchGenres()
-        } catch let networkError as NetworkError {
-            handleError(networkError, context: "LoadGenres") {
-                Task { await self.loadGenres() }
-            }
-        } catch {
-            let genericError = NetworkError.unknown
-            handleError(genericError, context: "LoadGenres") {
-                Task { await self.loadGenres() }
             }
         }
     }
