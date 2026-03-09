@@ -30,7 +30,7 @@ final class APIService: APIServiceProtocol {
     
     private func buildURL(for endpoint: APIEndpoint) throws -> URL {
         guard var components = URLComponents(
-            string: Configuration.baseURL + endpoint.path
+            string: Configuration().baseURL + endpoint.path
         ) else {
             throw NetworkError.invalidURL
         }

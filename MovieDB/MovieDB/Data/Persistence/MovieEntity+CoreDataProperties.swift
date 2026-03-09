@@ -21,6 +21,11 @@ extension MovieEntity {
     @NSManaged public var backdropPath: String?
     @NSManaged public var releaseDate: String?
     @NSManaged public var voteAverage: Double
+    @NSManaged public var voteCount: Int32
+    @NSManaged public var runtime: Int32
+    @NSManaged public var tagline: String?
+    @NSManaged public var status: String?
+    @NSManaged public var genres: String?
 }
 
 extension MovieEntity : Identifiable {

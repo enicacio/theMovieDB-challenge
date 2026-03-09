@@ -35,7 +35,7 @@ enum APIEndpoint {
     
     var queryItems: [URLQueryItem] {
         var items: [URLQueryItem] = [
-            URLQueryItem(name: "api_key", value: Configuration.apiKey),
+            URLQueryItem(name: "api_key", value: Configuration().apiKey),
             URLQueryItem(name: "language", value: "en-US")
         ]
         
@@ -45,6 +45,8 @@ enum APIEndpoint {
         case .searchMovies(let query, let page):
             items.append(URLQueryItem(name: "query", value: query))
             items.append(URLQueryItem(name: "page", value: String(page)))
+        case .movieDetails:
+            items.append(URLQueryItem(name: "append_to_response", value: "genres"))
         default:
             break
         }
