@@ -21,11 +21,18 @@ final class HomeViewModel: ObservableObject {
     @Published var isLoading = false
     @Published var error: ErrorMessage?
     @Published var searchText = ""
+    @Published var currentPage = 1
+    @Published var isLoadingMore = false
+    @Published var minRating: Double = 0.0
+    
+    // MARK: - Computed property
+    var filteredMovies: [Movie] {
+        movies.filter { $0.voteAverage >= minRating }
+    }
     
     // MARK: - Private Properties
     private let movieRepository: MovieRepositoryProtocol
     private let favoritesRepository: FavoritesRepositoryProtocol
-    private var currentPage = 1
     
     // MARK: - Initialization
     init(
@@ -108,6 +115,31 @@ final class HomeViewModel: ObservableObject {
             )
             self.error = errorMsg
         }
+    }
+    
+    func loadMoreMovies() async {
+        isLoadingMore = true
+        currentPage += 1
+        
+        do {
+            let newMovies = try await movieRepository.fetchPopularMovies(page: currentPage)
+            self.movies.append(contentsOf: newMovies)
+        } catch {
+            currentPage -= 1  // Volta se erro
+            let errorMsg = ErrorMessage(
+                message: "Erro ao carregar mais filmes",
+                retryAction: { [weak self] in
+                    Task { await self?.loadMoreMovies() }
+                }
+            )
+            self.error = errorMsg
+        }
+        
+        isLoadingMore = false
+    }
+    
+    func setMinRating(_ rating: Double) {
+        minRating = rating
     }
     
     // MARK: - Private Methods

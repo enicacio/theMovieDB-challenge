@@ -9,26 +9,41 @@
 
 final class MockFavoritesRepository: FavoritesRepositoryProtocol {
     var savedIds: Set<Int> = []
+    var mockIsFavorite = false
     var mockFavorites: [Movie] = []
     var mockError: NetworkError?
+    var saveFavoriteCalled = false
+    var removeFavoriteCalled = false
+    
+    func isFavorite(movieId: Int) async throws -> Bool {
+        if let error = mockError {
+            throw error
+        }
+        return mockIsFavorite
+    }
     
     func saveFavorite(_ movie: Movie) async throws {
-        if let error = mockError { throw error }
-        savedIds.insert(movie.id)
+        if let error = mockError {
+            throw error
+        }
+        saveFavoriteCalled = true
+        mockIsFavorite = true
+        mockFavorites.append(movie)
     }
     
     func removeFavorite(movieId: Int) async throws {
-        if let error = mockError { throw error }
-        savedIds.remove(movieId)
+        if let error = mockError {
+            throw error
+        }
+        removeFavoriteCalled = true
+        mockIsFavorite = false
+        mockFavorites.removeAll(where: { $0.id == movieId })
     }
     
     func fetchFavorites() async throws -> [Movie] {
-        if let error = mockError { throw error }
+        if let error = mockError {
+            throw error
+        }
         return mockFavorites
-    }
-    
-    func isFavorite(movieId: Int) async throws -> Bool {
-        if let error = mockError { throw error }
-        return savedIds.contains(movieId)
     }
 }

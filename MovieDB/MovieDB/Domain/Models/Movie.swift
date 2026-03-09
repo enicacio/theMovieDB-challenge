@@ -16,6 +16,10 @@ struct Movie: Codable, Identifiable {
     let backdropPath: String?
     let releaseDate: String?
     let voteAverage: Double
+    var voteCount: Int = 0
+    var runtime: Int = 0
+    var tagline: String?
+    var status: String? = nil
     var genreIds: [Int] = []
     
     // MARK: - Init Padrão (para Preview e testes)
@@ -27,6 +31,10 @@ struct Movie: Codable, Identifiable {
         backdropPath: String? = nil,
         releaseDate: String? = nil,
         voteAverage: Double,
+        voteCount: Int = 0,
+        runtime: Int = 0,
+        tagline: String? = nil,
+        status: String? = nil,
         genreIds: [Int] = []
     ) {
         self.id = id
@@ -36,6 +44,10 @@ struct Movie: Codable, Identifiable {
         self.backdropPath = backdropPath
         self.releaseDate = releaseDate
         self.voteAverage = voteAverage
+        self.voteCount = voteCount
+        self.runtime = runtime
+        self.tagline = tagline
+        self.status = status
         self.genreIds = genreIds
     }
     
@@ -59,7 +71,12 @@ struct Movie: Codable, Identifiable {
         case backdropPath = "backdrop_path"
         case releaseDate = "release_date"
         case voteAverage = "vote_average"
+        case voteCount = "vote_count"
+        case runtime
+        case tagline
+        case status
         case genreIds = "genre_ids"
+        case genres
     }
     
     // MARK: - Decodable (para API)
@@ -73,6 +90,36 @@ struct Movie: Codable, Identifiable {
         self.backdropPath = try container.decodeIfPresent(String.self, forKey: .backdropPath)
         self.releaseDate = try container.decodeIfPresent(String.self, forKey: .releaseDate)
         self.voteAverage = try container.decodeIfPresent(Double.self, forKey: .voteAverage) ?? 0.0
+        self.voteCount = try container.decodeIfPresent(Int.self, forKey: .voteCount) ?? 0
+        self.runtime = try container.decodeIfPresent(Int.self, forKey: .runtime) ?? 0
+        self.tagline = try container.decodeIfPresent(String.self, forKey: .tagline)
+        self.status = try container.decodeIfPresent(String.self, forKey: .status)
+        
+        // Tenta decodificar genre_ids (endpoints /popular, /search)
         self.genreIds = try container.decodeIfPresent([Int].self, forKey: .genreIds) ?? []
+        
+        // Se genre_ids vazio, extrai de genres (endpoint /movie/{id}?append_to_response=genres)
+        if self.genreIds.isEmpty {
+            let genres = try container.decodeIfPresent([Genre].self, forKey: .genres) ?? []
+            self.genreIds = genres.map { $0.id }
+        }
+    }
+    
+    // MARK: - Encodable
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        
+        try container.encode(id, forKey: .id)
+        try container.encode(title, forKey: .title)
+        try container.encodeIfPresent(overview, forKey: .overview)
+        try container.encodeIfPresent(posterPath, forKey: .posterPath)
+        try container.encodeIfPresent(backdropPath, forKey: .backdropPath)
+        try container.encodeIfPresent(releaseDate, forKey: .releaseDate)
+        try container.encode(voteAverage, forKey: .voteAverage)
+        try container.encode(voteCount, forKey: .voteCount)
+        try container.encode(runtime, forKey: .runtime)
+        try container.encodeIfPresent(tagline, forKey: .tagline)
+        try container.encodeIfPresent(status, forKey: .status)
+        try container.encode(genreIds, forKey: .genreIds)
     }
 }
