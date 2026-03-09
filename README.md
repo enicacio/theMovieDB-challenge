@@ -23,11 +23,14 @@ Uma aplicação iOS moderna desenvolvida em **SwiftUI** que permite aos usuário
 ## 📱 Screenshots
 
 <div align="center">
-  <h3>🏠 Tela Home com Busca</h3>
+  <h3>Tela Home com Busca</h3>
   <img src="screenshot_home.png" width="300" alt="Home Screen" />
   
-  <h3>❤️ Tela de Favoritos</h3>
+  <h3>Tela de Favoritos</h3>
   <img src="screenshot_favorites.png" width="300" alt="Favorites Screen" />
+  
+  <h3>Tela de Detalhes</h3>
+    <img src="screenshot_detail.png" width="300" alt="Favorites Screen" />
 </div>
 
 ---
