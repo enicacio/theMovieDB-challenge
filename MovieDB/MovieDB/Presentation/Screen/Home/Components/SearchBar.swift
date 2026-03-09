@@ -9,7 +9,6 @@ import SwiftUI
 
 struct SearchBar: View {
     @Binding var text: String
-    var onClear: (() -> Void)? = nil 
     
     var body: some View {
         HStack(spacing: 8) {
@@ -20,10 +19,7 @@ struct SearchBar: View {
                 .textFieldStyle(.roundedBorder)
             
             if !text.isEmpty {
-                Button(action: {
-                    text = ""
-                    onClear?()  // ← Chama o callback
-                }) {
+                Button(action: { text = "" }) {
                     Image(systemName: "xmark.circle.fill")
                         .foregroundColor(.secondary)
                 }
