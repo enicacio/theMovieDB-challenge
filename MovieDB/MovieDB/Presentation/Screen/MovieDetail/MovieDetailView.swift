@@ -10,6 +10,7 @@ import SwiftUI
 struct MovieDetailView: View {
     let movieId: Int
     @StateObject private var viewModel: MovieDetailViewModel
+    let formatter = MovieFormatter()
     
     init(movieId: Int) {
         self.movieId = movieId
@@ -27,7 +28,7 @@ struct MovieDetailView: View {
                     error.retryAction?()
                 })
             } else if let movie = viewModel.movie {
-                let genreNames = MovieFormatter.genreNames(from: movie.genreIds)
+                let genreNames = formatter.genreNames(from: movie.genreIds)
                 
                 ScrollView {
                     VStack(alignment: .leading, spacing: 0) {
@@ -82,7 +83,7 @@ struct MovieDetailView: View {
                                     HStack(spacing: 4) {
                                         Image(systemName: "star.fill")
                                             .foregroundColor(.yellow)
-                                        Text(MovieFormatter.formatRating(movie.voteAverage))
+                                        Text(formatter.formatRating(movie.voteAverage))
                                             .fontWeight(.semibold)
                                             .accessibilityIdentifier("rating")
                                     }
@@ -90,7 +91,7 @@ struct MovieDetailView: View {
                                     HStack(spacing: 4) {
                                         Image(systemName: "person.fill")
                                             .foregroundColor(.blue)
-                                        Text("\(MovieFormatter.formatVoteCount(movie.voteCount)) votes")
+                                        Text("\(formatter.formatVoteCount(movie.voteCount)) votes")
                                             .font(.system(size: 14))
                                             .accessibilityIdentifier("voteCount")
                                     }
@@ -114,7 +115,7 @@ struct MovieDetailView: View {
                                         .fontWeight(.semibold)
                                         .foregroundColor(.secondary)
                                     
-                                    Text(MovieFormatter.formatReleaseDate(releaseDate))
+                                    Text(formatter.formatReleaseDate(releaseDate))
                                         .font(.system(size: 16, weight: .medium))
                                         .accessibilityIdentifier("releaseDate")
                                 }
@@ -128,7 +129,7 @@ struct MovieDetailView: View {
                                         .fontWeight(.semibold)
                                         .foregroundColor(.secondary)
                                     
-                                    Text(MovieFormatter.formatRuntime(movie.runtime))
+                                    Text(formatter.formatRuntime(movie.runtime))
                                         .font(.system(size: 16, weight: .medium))
                                         .accessibilityIdentifier("runtime")
                                 }

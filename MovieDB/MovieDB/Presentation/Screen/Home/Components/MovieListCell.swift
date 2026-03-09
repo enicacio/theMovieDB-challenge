@@ -11,9 +11,10 @@ struct MovieListCell: View {
     let movie: Movie
     let onFavoriteTap: () -> Void
     @State private var isFavorite = false
+    let formatter = MovieFormatter()
     
     private var genreNames: [String] {
-        MovieFormatter.genreNames(from: movie.genreIds)
+        formatter.genreNames(from: movie.genreIds)
     }
     
     var body: some View {

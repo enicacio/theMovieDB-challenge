@@ -51,15 +51,17 @@ struct Movie: Codable, Identifiable {
         self.genreIds = genreIds
     }
     
+    let config = Configuration()
+    
     // MARK: - Computed Properties
     var posterURL: URL? {
         guard let posterPath = posterPath else { return nil }
-        return URL(string: Configuration.imageBaseURL + posterPath)
+        return URL(string: config.imageBaseURL + posterPath)
     }
     
     var backdropURL: URL? {
         guard let backdropPath = backdropPath else { return nil }
-        return URL(string: Configuration.imageBaseURL + backdropPath)
+        return URL(string: config.imageBaseURL + backdropPath)
     }
     
     // MARK: - Coding Keys

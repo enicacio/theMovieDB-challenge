@@ -35,7 +35,7 @@ enum APIEndpoint {
     
     var queryItems: [URLQueryItem] {
         var items: [URLQueryItem] = [
-            URLQueryItem(name: "api_key", value: Configuration.apiKey),
+            URLQueryItem(name: "api_key", value: Configuration().apiKey),
             URLQueryItem(name: "language", value: "en-US")
         ]
         

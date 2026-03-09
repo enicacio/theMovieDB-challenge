@@ -9,13 +9,13 @@ import Foundation
 
 /// Utility namespace para formatação de dados de filmes
 /// Usa enum em vez de struct para namespace puro (sem instância)
-enum MovieFormatter {
+struct MovieFormatter {
     
     // MARK: - Genre Mapping
     
     /// Mapeamento de IDs de gênero para nomes em inglês
     /// Reutilizável em qualquer lugar do app
-    static let genreMap: [Int: String] = [
+    let genreMap: [Int: String] = [
         28: "Action",
         12: "Adventure",
         16: "Animation",
@@ -40,7 +40,7 @@ enum MovieFormatter {
     /// Converte array de IDs de gênero para array de nomes
     /// - Parameter genreIds: Array de IDs de gênero
     /// - Returns: Array de nomes de gênero
-    static func genreNames(from genreIds: [Int]) -> [String] {
+    func genreNames(from genreIds: [Int]) -> [String] {
         genreIds.compactMap { genreMap[$0] }
     }
     
@@ -49,7 +49,7 @@ enum MovieFormatter {
     /// Converte string de data "YYYY-MM-DD" para formato "Month DD, YYYY"
     /// - Parameter dateString: Data em formato "YYYY-MM-DD"
     /// - Returns: Data formatada ou string original se parsing falhar
-    static func formatReleaseDate(_ dateString: String) -> String {
+    func formatReleaseDate(_ dateString: String) -> String {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd"
         
@@ -66,7 +66,7 @@ enum MovieFormatter {
     /// Converte minutos para formato "Xh Ymin"
     /// - Parameter minutes: Duração em minutos
     /// - Returns: String formatada (ex: "2h 19min")
-    static func formatRuntime(_ minutes: Int) -> String {
+    func formatRuntime(_ minutes: Int) -> String {
         guard minutes > 0 else { return "" }
         
         let hours = minutes / 60
@@ -83,7 +83,7 @@ enum MovieFormatter {
     /// Converte número de votos para formato compacto
     /// - Parameter count: Número de votos
     /// - Returns: String formatada (ex: "29.7K", "1.2M")
-    static func formatVoteCount(_ count: Int) -> String {
+    func formatVoteCount(_ count: Int) -> String {
         if count >= 1_000_000 {
             return String(format: "%.1fM", Double(count) / 1_000_000)
         } else if count >= 1_000 {
@@ -97,14 +97,14 @@ enum MovieFormatter {
     /// Formata rating com até 1 casa decimal
     /// - Parameter rating: Valor do rating (0-10)
     /// - Returns: String formatada (ex: "8.4")
-    static func formatRating(_ rating: Double) -> String {
+    func formatRating(_ rating: Double) -> String {
         return String(format: "%.1f", rating)
     }
     
     /// Retorna nome de gênero para um ID específico
     /// - Parameter genreId: ID do gênero
     /// - Returns: Nome do gênero ou nil se não encontrado
-    static func genreName(for genreId: Int) -> String? {
+    func genreName(for genreId: Int) -> String? {
         genreMap[genreId]
     }
     
@@ -115,7 +115,7 @@ enum MovieFormatter {
     ///   - text: Texto a truncar
     ///   - maxLength: Comprimento máximo
     /// - Returns: String truncada com "..." se necessário
-    static func truncate(_ text: String, to maxLength: Int) -> String {
+    func truncate(_ text: String, to maxLength: Int) -> String {
         guard text.count > maxLength else { return text }
         return String(text.prefix(maxLength)) + "..."
     }
@@ -125,7 +125,7 @@ enum MovieFormatter {
     /// Formata todos os dados principais de um filme para exibição
     /// - Parameter movie: Filme a formatar
     /// - Returns: Dictionary com dados formatados
-    static func formatMovieForDisplay(_ movie: Movie) -> [String: String] {
+    func formatMovieForDisplay(_ movie: Movie) -> [String: String] {
         return [
             "title": movie.title,
             "releaseDate": movie.releaseDate.map { formatReleaseDate($0) } ?? "N/A",
