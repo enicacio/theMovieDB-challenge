@@ -7,6 +7,8 @@
 
 import SwiftUI
 
+import SwiftUI
+
 struct FavoritesView: View {
     @StateObject private var viewModel = FavoritesViewModel()
     @State private var navigationPath = NavigationPath()
@@ -22,7 +24,6 @@ struct FavoritesView: View {
                     })
                 } else if viewModel.favorites.isEmpty {
                     EmptyStateView(message: "No favorite movies yet")
-                        .accessibilityIdentifier("emptyFavoritesLabel")
                 } else {
                     List(viewModel.favorites) { movie in
                         NavigationLink(value: movie.id) {
@@ -31,12 +32,10 @@ struct FavoritesView: View {
                                     await viewModel.removeFavorite(movieId: movie.id)
                                 }
                             }
-                            .accessibilityIdentifier("favoriteCell_\(movie.id)")
                         }
                         .buttonStyle(.plain)
                     }
                     .listStyle(.plain)
-                    .accessibilityIdentifier("favoritesTable")
                 }
             }
             .navigationTitle("Favorites")

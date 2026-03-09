@@ -1,8 +1,8 @@
 //
 //  MovieDetailViewModelTests.swift
-//  MovieDBTests
+//  MovieDB
 //
-//  Created by Test on 08/03/26.
+//  Created by Eliane Regina Nicácio Mendes on 07/03/26.
 //
 
 import XCTest
@@ -10,12 +10,10 @@ import XCTest
 
 @MainActor
 final class MovieDetailViewModelTests: XCTestCase {
-    
     var sut: MovieDetailViewModel!
     var mockMovieRepository: MockMovieRepository!
     var mockFavoritesRepository: MockFavoritesRepository!
     
-    @MainActor
     override func setUp() {
         super.setUp()
         mockMovieRepository = MockMovieRepository()
@@ -34,160 +32,228 @@ final class MovieDetailViewModelTests: XCTestCase {
         super.tearDown()
     }
     
-    // MARK: - Load Movie Details Tests
-    
+    // MARK: - loadMovieDetails Tests
     func testLoadMovieDetailsSuccess() async {
-        let expectedMovie = Movie(
+        // Arrange
+        let mockMovie = Movie(
             id: 550,
             title: "Fight Club",
             overview: "An insomniac office worker...",
+            posterPath: "/path.jpg",
+            backdropPath: "/backdrop.jpg",
             releaseDate: "1999-10-15",
-            voteAverage: 8.4
+            voteAverage: 8.4,
+            genreIds: [18, 53]
         )
-        mockMovieRepository.mockMovie = expectedMovie
-        mockFavoritesRepository.mockIsFavorite = false
+        mockMovieRepository.mockMovieDetail = mockMovie
+        mockFavoritesRepository.mockFavorites = []
         
+        // Act
         await sut.loadMovieDetails()
         
+        // Assert
         XCTAssertEqual(sut.movie?.id, 550)
         XCTAssertEqual(sut.movie?.title, "Fight Club")
-        XCTAssertFalse(sut.isLoading)
+        XCTAssertFalse(sut.isFavorite)
         XCTAssertNil(sut.error)
     }
     
-    // MARK: - New Fields Tests (Melhoria 4)
-    
-    func testLoadMovieDetailsWithAllNewFields() async {
-        let movieWithNewFields = Movie(
-            id: 550,
-            title: "Fight Club",
-            overview: "An insomniac office worker and a devil-may-care soapmaker form an underground fight club.",
-            releaseDate: "1999-10-15",
-            voteAverage: 8.4,
-            voteCount: 29696,
-            runtime: 139,
-            tagline: "Your mind is the scene of the crime.",
-            status: "Released",
-            genreIds: [18, 28, 53]
-        )
-        mockMovieRepository.mockMovie = movieWithNewFields
-        mockFavoritesRepository.mockIsFavorite = false
+    func testLoadMovieDetailsNetworkError() async {
+        // Arrange
+        mockMovieRepository.mockError = .networkUnavailable
         
+        // Act
         await sut.loadMovieDetails()
         
-        XCTAssertEqual(sut.movie?.voteCount, 29696)
-        XCTAssertEqual(sut.movie?.runtime, 139)
-        XCTAssertEqual(sut.movie?.tagline, "Your mind is the scene of the crime.")
-        XCTAssertEqual(sut.movie?.status, "Released")
-        XCTAssertEqual(sut.movie?.genreIds, [18, 28, 53])
-    }
-    
-    func testLoadMovieDetailsWithGenreIds() async {
-        let movieWithGenres = Movie(
-            id: 550,
-            title: "Fight Club",
-            voteAverage: 8.4,
-            genreIds: [18, 28, 53]
-        )
-        mockMovieRepository.mockMovie = movieWithGenres
-        mockFavoritesRepository.mockIsFavorite = false
-        
-        await sut.loadMovieDetails()
-        
-        XCTAssertEqual(sut.movie?.genreIds, [18, 28, 53])
-        XCTAssertFalse(sut.movie?.genreIds.isEmpty ?? true)
-    }
-    
-    func testLoadMovieDetailsError() async {
-        mockMovieRepository.mockError = NetworkError.unknown
-        
-        await sut.loadMovieDetails()
-        
+        // Assert
         XCTAssertNil(sut.movie)
         XCTAssertNotNil(sut.error)
-        XCTAssertFalse(sut.isLoading)
+        XCTAssertEqual(sut.error?.message, "Network is unavailable. Please check your internet connection.")
     }
     
-    // MARK: - Favorite Tests
+    func testLoadMovieDetailsServerError() async {
+        // Arrange
+        mockMovieRepository.mockError = .serverError(statusCode: 500)
+        
+        // Act
+        await sut.loadMovieDetails()
+        
+        // Assert
+        XCTAssertNil(sut.movie)
+        XCTAssertNotNil(sut.error)
+    }
     
-    func testToggleFavoriteAddsFavorite() async {
-        let movie = Movie(
+    func testLoadMovieDetailsChecksFavoriteStatus() async {
+        // Arrange
+        let mockMovie = Movie(
             id: 550,
             title: "Fight Club",
+            overview: nil,
+            posterPath: nil,
+            backdropPath: nil,
+            releaseDate: nil,
+            voteAverage: 8.0
+        )
+        mockMovieRepository.mockMovieDetail = mockMovie
+        mockFavoritesRepository.savedIds = [550]
+        
+        // Act
+        await sut.loadMovieDetails()
+        
+        // Assert
+        XCTAssertTrue(sut.isFavorite)
+    }
+    
+    // MARK: - loadGenres Tests
+    func testLoadGenresSuccess() async {
+        // Arrange
+        mockMovieRepository.mockGenres = [
+            Genre(id: 18, name: "Drama"),
+            Genre(id: 53, name: "Thriller")
+        ]
+        sut.movie = Movie(
+            id: 550,
+            title: "Fight Club",
+            overview: nil,
+            posterPath: nil,
+            backdropPath: nil,
+            releaseDate: nil,
             voteAverage: 8.4,
-            voteCount: 29696,
-            runtime: 139,
-            genreIds: [18, 28, 53]
+            genreIds: [18, 53]
+        )
+        
+        // Act
+        await sut.loadGenres()
+        
+        // Assert
+        XCTAssertEqual(sut.genres.count, 2)
+        XCTAssertEqual(sut.genreNames.count, 2)
+        XCTAssertTrue(sut.genreNames.contains("Drama"))
+        XCTAssertTrue(sut.genreNames.contains("Thriller"))
+    }
+    
+    func testLoadGenresError() async {
+        // Arrange
+        mockMovieRepository.mockError = .networkUnavailable
+        
+        // Act
+        await sut.loadGenres()
+        
+        // Assert
+        XCTAssertTrue(sut.genres.isEmpty)
+        XCTAssertNotNil(sut.error)
+    }
+    
+    func testGenreNamesWhenMovieIsNil() {
+        // Arrange
+        sut.movie = nil
+        mockMovieRepository.mockGenres = [Genre(id: 18, name: "Drama")]
+        
+        // Assert
+        XCTAssertTrue(sut.genreNames.isEmpty)
+    }
+    
+    func testGenreNamesFiltersCorrectly() {
+        // Arrange
+        sut.movie = Movie(
+            id: 1,
+            title: "Test",
+            overview: nil,
+            posterPath: nil,
+            backdropPath: nil,
+            releaseDate: nil,
+            voteAverage: 8.0,
+            genreIds: [18]
+        )
+        mockMovieRepository.mockGenres = [
+            Genre(id: 18, name: "Drama"),
+            Genre(id: 53, name: "Thriller"),
+            Genre(id: 28, name: "Action")
+        ]
+        sut.genres = mockMovieRepository.mockGenres
+        
+        // Assert
+        XCTAssertEqual(sut.genreNames.count, 1)
+        XCTAssertEqual(sut.genreNames.first, "Drama")
+    }
+    
+    // MARK: - toggleFavorite Tests
+    func testToggleFavoriteFromUnfavorited() async {
+        // Arrange
+        let movie = Movie(
+            id: 550,
+            title: "Test",
+            overview: nil,
+            posterPath: nil,
+            backdropPath: nil,
+            releaseDate: nil,
+            voteAverage: 8.0
         )
         sut.movie = movie
-        mockFavoritesRepository.mockIsFavorite = false
+        sut.isFavorite = false
         
+        // Act
         await sut.toggleFavorite()
         
+        // Assert
         XCTAssertTrue(sut.isFavorite)
-        XCTAssertTrue(mockFavoritesRepository.saveFavoriteCalled)
+        XCTAssertTrue(mockFavoritesRepository.savedIds.contains(550))
     }
     
-    func testToggleFavoriteRemovesFavorite() async {
+    func testToggleFavoriteFromFavorited() async {
+        // Arrange
         let movie = Movie(
             id: 550,
-            title: "Fight Club",
-            voteAverage: 8.4
+            title: "Test",
+            overview: nil,
+            posterPath: nil,
+            backdropPath: nil,
+            releaseDate: nil,
+            voteAverage: 8.0
         )
         sut.movie = movie
         sut.isFavorite = true
-        mockFavoritesRepository.mockIsFavorite = true
+        mockFavoritesRepository.savedIds = [550]
         
+        // Act
         await sut.toggleFavorite()
         
+        // Assert
         XCTAssertFalse(sut.isFavorite)
-        XCTAssertTrue(mockFavoritesRepository.removeFavoriteCalled)
+        XCTAssertFalse(mockFavoritesRepository.savedIds.contains(550))
     }
     
-    func testToggleFavoriteWithNoMovieFails() async {
-        sut.movie = nil
-        
-        let initialFavorite = sut.isFavorite
-        await sut.toggleFavorite()
-        
-        // Não muda porque movie é nil
-        XCTAssertEqual(sut.isFavorite, initialFavorite)
-    }
-    
-    func testToggleFavoriteRevertOnError() async {
+    func testToggleFavoriteError() async {
+        // Arrange
         let movie = Movie(
             id: 550,
-            title: "Fight Club",
-            voteAverage: 8.4
+            title: "Test",
+            overview: nil,
+            posterPath: nil,
+            backdropPath: nil,
+            releaseDate: nil,
+            voteAverage: 8.0
         )
         sut.movie = movie
-        mockFavoritesRepository.mockIsFavorite = false
-        mockFavoritesRepository.mockError = NetworkError.unknown
+        sut.isFavorite = false
+        mockFavoritesRepository.mockError = .unknown
         
+        // Act
         await sut.toggleFavorite()
         
-        // Deve reverter ao estado anterior
-        XCTAssertFalse(sut.isFavorite)
+        // Assert
+        XCTAssertFalse(sut.isFavorite) // Reverteu
         XCTAssertNotNil(sut.error)
     }
     
-    // MARK: - Loading State Tests
-    
-    func testLoadMovieDetailsStartsWithLoading() async {
-        mockMovieRepository.mockMovie = Movie(
-            id: 550,
-            title: "Fight Club",
-            voteAverage: 8.4
-        )
+    func testToggleFavoriteWhenMovieIsNil() async {
+        // Arrange
+        sut.movie = nil
         
-        let task = Task {
-            await sut.loadMovieDetails()
-        }
+        // Act
+        await sut.toggleFavorite()
         
-        // Note: isLoading pode já ter mudado dependendo da velocidade
-        // Mas ao final deve ser false
-        await task.value
-        
-        XCTAssertFalse(sut.isLoading)
+        // Assert
+        XCTAssertNil(sut.movie)
     }
 }

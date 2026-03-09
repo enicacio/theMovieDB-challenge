@@ -27,33 +27,27 @@ struct MovieDetailView: View {
                     error.retryAction?()
                 })
             } else if let movie = viewModel.movie {
-                let genreNames = MovieFormatter.genreNames(from: movie.genreIds)
-                
                 ScrollView {
-                    VStack(alignment: .leading, spacing: 0) {
+                    VStack(alignment: .leading) {
                         // Backdrop
                         CachedAsyncImage(url: movie.backdropURL)
                             .scaledToFill()
-                            .frame(maxWidth: .infinity, minHeight: 200)
+                            .frame(maxWidth: .infinity)
                             .clipped()
                         
                         // Content
-                        VStack(alignment: .leading, spacing: 16) {
+                        VStack(alignment: .leading) {
                             // Title
-                            HStack(alignment: .top, spacing: 12) {
-                                VStack(alignment: .leading, spacing: 8) {
+                            HStack(alignment: .top) {
+                                VStack(alignment: .leading) {
                                     Text(movie.title)
                                         .font(.title2)
                                         .fontWeight(.bold)
-                                        .accessibilityIdentifier("movieDetailTitle")
                                     
-                                    // Tagline (if available)
-                                    if let tagline = movie.tagline, !tagline.isEmpty {
-                                        Text(tagline)
-                                            .italic()
+                                    if !viewModel.genreNames.isEmpty {
+                                        Text(viewModel.genreNames.joined(separator: ", "))
                                             .font(.caption)
                                             .foregroundColor(.secondary)
-                                            .accessibilityIdentifier("tagline")
                                     }
                                 }
                                 
@@ -68,110 +62,22 @@ struct MovieDetailView: View {
                                         .font(.title2)
                                         .foregroundColor(.red)
                                 }
-                                .accessibilityIdentifier("favoriteButton")
                             }
                             
                             // Rating
-                            VStack(alignment: .leading, spacing: 8) {
-                                Label("Rating", systemImage: "")
-                                    .font(.caption)
-                                    .fontWeight(.semibold)
-                                    .foregroundColor(.secondary)
+                            HStack {
+                                Label(
+                                    String(format: "%.1f", movie.voteAverage),
+                                    systemImage: "star.fill"
+                                )
+                                .foregroundColor(.yellow)
                                 
-                                HStack(spacing: 16) {
-                                    HStack(spacing: 4) {
-                                        Image(systemName: "star.fill")
-                                            .foregroundColor(.yellow)
-                                        Text(MovieFormatter.formatRating(movie.voteAverage))
-                                            .fontWeight(.semibold)
-                                            .accessibilityIdentifier("rating")
-                                    }
-                                    
-                                    HStack(spacing: 4) {
-                                        Image(systemName: "person.fill")
-                                            .foregroundColor(.blue)
-                                        Text("\(MovieFormatter.formatVoteCount(movie.voteCount)) votes")
-                                            .font(.system(size: 14))
-                                            .accessibilityIdentifier("voteCount")
-                                    }
-                                    
-                                    Spacer()
-                                }
-                                .font(.system(size: 16))
-                            }
-                            .padding(.vertical, 8)
-                            .padding(.horizontal, 12)
-                            .background(Color(.systemGray6))
-                            .cornerRadius(8)
-                            
-                            Divider()
-                            
-                            // Release
-                            if let releaseDate = movie.releaseDate, !releaseDate.isEmpty {
-                                VStack(alignment: .leading, spacing: 8) {
-                                    Label("Release Date", systemImage: "calendar")
+                                Spacer()
+                                
+                                if let releaseDate = movie.releaseDate, !releaseDate.isEmpty {
+                                    Text(releaseDate)
                                         .font(.caption)
-                                        .fontWeight(.semibold)
                                         .foregroundColor(.secondary)
-                                    
-                                    Text(MovieFormatter.formatReleaseDate(releaseDate))
-                                        .font(.system(size: 16, weight: .medium))
-                                        .accessibilityIdentifier("releaseDate")
-                                }
-                            }
-                            
-                            // Runtime
-                            if movie.runtime > 0 {
-                                VStack(alignment: .leading, spacing: 8) {
-                                    Label("Runtime", systemImage: "clock.fill")
-                                        .font(.caption)
-                                        .fontWeight(.semibold)
-                                        .foregroundColor(.secondary)
-                                    
-                                    Text(MovieFormatter.formatRuntime(movie.runtime))
-                                        .font(.system(size: 16, weight: .medium))
-                                        .accessibilityIdentifier("runtime")
-                                }
-                            }
-                            
-                            // Status
-                            if let status = movie.status, !status.isEmpty {
-                                VStack(alignment: .leading, spacing: 8) {
-                                    Label("Status", systemImage: "checkmark.circle.fill")
-                                        .font(.caption)
-                                        .fontWeight(.semibold)
-                                        .foregroundColor(.secondary)
-                                    
-                                    Text(status)
-                                        .font(.system(size: 16, weight: .medium))
-                                        .accessibilityIdentifier("status")
-                                }
-                            }
-                            
-                            Divider()
-                            
-                            // Genres
-                            if !genreNames.isEmpty {
-                                VStack(alignment: .leading, spacing: 8) {
-                                    Label("Genres", systemImage: "film.fill")
-                                        .font(.caption)
-                                        .fontWeight(.semibold)
-                                        .foregroundColor(.secondary)
-                                    
-                                    HStack {
-                                        ForEach(genreNames, id: \.self) { genre in
-                                            Text(genre)
-                                                .font(.system(size: 12, weight: .medium))
-                                                .padding(.vertical, 6)
-                                                .padding(.horizontal, 12)
-                                                .background(Color.blue.opacity(0.1))
-                                                .foregroundColor(.blue)
-                                                .cornerRadius(6)
-                                        }
-                                        Spacer()
-                                    }
-                                    .lineLimit(1)
-                                    .accessibilityIdentifier("genres")
                                 }
                             }
                             
@@ -179,16 +85,12 @@ struct MovieDetailView: View {
                             
                             // Overview
                             if let overview = movie.overview, !overview.isEmpty {
-                                VStack(alignment: .leading, spacing: 8) {
-                                    Label("Overview", systemImage: "text.book.closed.fill")
-                                        .font(.caption)
-                                        .fontWeight(.semibold)
-                                        .foregroundColor(.secondary)
+                                VStack(alignment: .leading) {
+                                    Text("Overview")
+                                        .font(.headline)
                                     
                                     Text(overview)
-                                        .font(.system(size: 14))
-                                        .lineSpacing(4)
-                                        .accessibilityIdentifier("overview")
+                                        .font(.body)
                                 }
                             }
                         }
@@ -203,6 +105,7 @@ struct MovieDetailView: View {
         .navigationBarTitleDisplayMode(.inline)
         .task {
             await viewModel.loadMovieDetails()
+            await viewModel.loadGenres()
         }
     }
 }
