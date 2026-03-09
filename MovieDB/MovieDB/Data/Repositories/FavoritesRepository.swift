@@ -19,7 +19,20 @@ final class FavoritesRepository: FavoritesRepositoryProtocol {
     
     // MARK: - FavoritesRepositoryProtocol
     func saveFavorite(_ movie: Movie) async throws {
-        let entity = MovieEntity(context: container.viewContext)
+        // Procurar se já existe com este ID
+        let fetchRequest = MovieEntity.fetchRequest()
+        fetchRequest.predicate = NSPredicate(format: "id == %d", movie.id)
+        
+        let results = try container.viewContext.fetch(fetchRequest)
+        
+        // Se existe, atualizar; se não, criar novo
+        let entity: MovieEntity
+        if let existing = results.first {
+            entity = existing  // ✅ ATUALIZAR registro existente
+        } else {
+            entity = MovieEntity(context: container.viewContext)  // Criar novo
+        }
+        
         entity.id = Int32(exactly: movie.id) ?? 0
         entity.title = movie.title
         entity.overview = movie.overview

@@ -45,6 +45,7 @@ struct MovieDetailView: View {
                                     Text(movie.title)
                                         .font(.title2)
                                         .fontWeight(.bold)
+                                        .accessibilityIdentifier("movieDetailTitle")
                                     
                                     // Tagline (if available)
                                     if let tagline = movie.tagline, !tagline.isEmpty {
@@ -52,6 +53,7 @@ struct MovieDetailView: View {
                                             .italic()
                                             .font(.caption)
                                             .foregroundColor(.secondary)
+                                            .accessibilityIdentifier("tagline")
                                     }
                                 }
                                 
@@ -66,6 +68,7 @@ struct MovieDetailView: View {
                                         .font(.title2)
                                         .foregroundColor(.red)
                                 }
+                                .accessibilityIdentifier("favoriteButton")
                             }
                             
                             // Rating
@@ -81,6 +84,7 @@ struct MovieDetailView: View {
                                             .foregroundColor(.yellow)
                                         Text(MovieFormatter.formatRating(movie.voteAverage))
                                             .fontWeight(.semibold)
+                                            .accessibilityIdentifier("rating")
                                     }
                                     
                                     HStack(spacing: 4) {
@@ -88,6 +92,7 @@ struct MovieDetailView: View {
                                             .foregroundColor(.blue)
                                         Text("\(MovieFormatter.formatVoteCount(movie.voteCount)) votes")
                                             .font(.system(size: 14))
+                                            .accessibilityIdentifier("voteCount")
                                     }
                                     
                                     Spacer()
@@ -111,6 +116,7 @@ struct MovieDetailView: View {
                                     
                                     Text(MovieFormatter.formatReleaseDate(releaseDate))
                                         .font(.system(size: 16, weight: .medium))
+                                        .accessibilityIdentifier("releaseDate")
                                 }
                             }
                             
@@ -124,6 +130,7 @@ struct MovieDetailView: View {
                                     
                                     Text(MovieFormatter.formatRuntime(movie.runtime))
                                         .font(.system(size: 16, weight: .medium))
+                                        .accessibilityIdentifier("runtime")
                                 }
                             }
                             
@@ -137,6 +144,7 @@ struct MovieDetailView: View {
                                     
                                     Text(status)
                                         .font(.system(size: 16, weight: .medium))
+                                        .accessibilityIdentifier("status")
                                 }
                             }
                             
@@ -163,6 +171,7 @@ struct MovieDetailView: View {
                                         Spacer()
                                     }
                                     .lineLimit(1)
+                                    .accessibilityIdentifier("genres")
                                 }
                             }
                             
@@ -179,6 +188,7 @@ struct MovieDetailView: View {
                                     Text(overview)
                                         .font(.system(size: 14))
                                         .lineSpacing(4)
+                                        .accessibilityIdentifier("overview")
                                 }
                             }
                         }

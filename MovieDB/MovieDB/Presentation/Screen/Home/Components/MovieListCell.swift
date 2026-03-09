@@ -18,20 +18,17 @@ struct MovieListCell: View {
     
     var body: some View {
         HStack(spacing: 12) {
-            // Poster
             CachedAsyncImage(url: movie.posterURL)
                 .frame(width: 60, height: 90)
                 .clipped()
                 .cornerRadius(6)
             
-            // Info
             VStack(alignment: .leading, spacing: 8) {
-                // Title
                 Text(movie.title)
                     .font(.headline)
                     .lineLimit(2)
+                    .accessibilityIdentifier("movieTitle")
                 
-                // Rating with Label
                 HStack(spacing: 4) {
                     Image(systemName: "star.fill")
                         .foregroundColor(.yellow)
@@ -39,9 +36,9 @@ struct MovieListCell: View {
                     Text(String(format: "%.1f", movie.voteAverage))
                         .font(.caption)
                         .fontWeight(.semibold)
+                        .accessibilityIdentifier("movieRating")
                 }
                 
-                // Release Date with Label
                 if let releaseDate = movie.releaseDate, !releaseDate.isEmpty {
                     HStack(spacing: 4) {
                         Image(systemName: "calendar")
@@ -50,10 +47,10 @@ struct MovieListCell: View {
                         Text(releaseDate)
                             .font(.caption2)
                             .foregroundColor(.secondary)
+                            .accessibilityIdentifier("releaseDate")
                     }
                 }
                 
-                // Genres with Label
                 if !genreNames.isEmpty {
                     HStack(spacing: 4) {
                         Image(systemName: "film.fill")
@@ -63,6 +60,7 @@ struct MovieListCell: View {
                             .font(.caption2)
                             .foregroundColor(.secondary)
                             .lineLimit(1)
+                            .accessibilityIdentifier("genres")
                     }
                 }
             }
@@ -70,7 +68,6 @@ struct MovieListCell: View {
             
             Spacer()
             
-            // Favorite Button
             Button(action: {
                 isFavorite.toggle()
                 onFavoriteTap()
@@ -79,10 +76,12 @@ struct MovieListCell: View {
                     .foregroundColor(.red)
                     .font(.title3)
             }
+            .accessibilityIdentifier("favoriteButton")
         }
         .padding()
         .background(Color(.systemBackground))
         .cornerRadius(12)
+        .accessibilityIdentifier("movieCell_\(movie.id)")
     }
 }
 

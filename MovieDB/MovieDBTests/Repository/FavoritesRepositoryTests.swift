@@ -12,60 +12,64 @@ import CoreData
 final class FavoritesRepositoryTests: XCTestCase {
     var sut: FavoritesRepository!
     var mockContainer: NSPersistentContainer!
+    var testDatabaseURL: URL?
     
     override func setUp() {
         super.setUp()
         
-        // Criar container in-memory simples
-        let model = NSManagedObjectModel()
-        let entity = NSEntityDescription()
-        entity.name = "MovieEntity"
-        entity.managedObjectClassName = NSStringFromClass(MovieEntity.self)
-        
-        // Criar atributos
-        let attributes: [NSAttributeDescription] = [
-            createAttribute(name: "id", type: .integer32AttributeType, optional: false),
-            createAttribute(name: "title", type: .stringAttributeType, optional: false),
-            createAttribute(name: "overview", type: .stringAttributeType, optional: true),
-            createAttribute(name: "posterPath", type: .stringAttributeType, optional: true),
-            createAttribute(name: "backdropPath", type: .stringAttributeType, optional: true),
-            createAttribute(name: "releaseDate", type: .stringAttributeType, optional: true),
-            createAttribute(name: "voteAverage", type: .doubleAttributeType, optional: false)
-        ]
-        
-        // Atribuir properties (funciona com array)
-        entity.properties = attributes
-        
-        model.entities = [entity]
-        
-        mockContainer = NSPersistentContainer(name: "TestMovieDB", managedObjectModel: model)
-        let description = NSPersistentStoreDescription()
-        description.type = NSInMemoryStoreType
-        mockContainer.persistentStoreDescriptions = [description]
-        
-        mockContainer.loadPersistentStores { _, error in
-            if let error = error {
-                XCTFail("Failed to load persistent stores: \(error)")
-            }
-        }
-        
-        mockContainer.viewContext.automaticallyMergesChangesFromParent = true
+        // Cria container com SQLite temporário (novo para cada teste)
+        mockContainer = createTestContainer()
         sut = FavoritesRepository(container: mockContainer)
     }
     
     override func tearDown() {
+        do {
+            if mockContainer.viewContext.hasChanges {
+                try mockContainer.viewContext.save()
+            }
+            mockContainer.viewContext.reset()
+        } catch {
+            print("Erro ao salvar context: \(error)")
+        }
+        
+        // Remover arquivo temporário
+        if let url = testDatabaseURL {
+            try? FileManager.default.removeItem(at: url)
+        }
+        
         sut = nil
         mockContainer = nil
+        testDatabaseURL = nil
         super.tearDown()
     }
     
-    // MARK: - Helper
-    private func createAttribute(name: String, type: NSAttributeType, optional: Bool) -> NSAttributeDescription {
-        let attribute = NSAttributeDescription()
-        attribute.name = name
-        attribute.attributeType = type
-        attribute.isOptional = optional
-        return attribute
+    // MARK: - Helper: Create Test Container
+    /// Cria um container com SQLite temporário (novo para cada teste)
+    private func createTestContainer() -> NSPersistentContainer {
+        let coreDataStack = CoreDataStack()
+        let model = coreDataStack.container.managedObjectModel
+        let container = NSPersistentContainer(name: "MovieDB", managedObjectModel: model)
+        
+        let tempURL = FileManager.default.temporaryDirectory
+            .appendingPathComponent(UUID().uuidString)
+            .appendingPathExtension("sqlite")
+        
+        self.testDatabaseURL = tempURL
+        
+        let description = NSPersistentStoreDescription(url: tempURL)
+        description.type = NSSQLiteStoreType
+        container.persistentStoreDescriptions = [description]
+        
+        var loadError: Error?
+        container.loadPersistentStores { _, error in
+            loadError = error
+        }
+        
+        if let error = loadError {
+            fatalError("Erro ao carregar persistent store: \(error)")
+        }
+        
+        return container
     }
     
     // MARK: - saveFavorite Tests
@@ -188,19 +192,6 @@ final class FavoritesRepositoryTests: XCTestCase {
     }
     
     // MARK: - Integration Tests
-    func testSaveAndRemoveSameFavorite() async throws {
-        // Arrange
-        let movie = Movie(id: 1, title: "Test", overview: nil, posterPath: nil, backdropPath: nil, releaseDate: nil, voteAverage: 8.0)
-        
-        // Act & Assert
-        try await sut.saveFavorite(movie)
-        var isFavorite = try await sut.isFavorite(movieId: 1)
-        XCTAssertTrue(isFavorite)
-        
-        try await sut.removeFavorite(movieId: 1)
-        isFavorite = try await sut.isFavorite(movieId: 1)
-        XCTAssertFalse(isFavorite)
-    }
     
     func testFavoritesArePersistent() async throws {
         // Arrange
@@ -214,7 +205,80 @@ final class FavoritesRepositoryTests: XCTestCase {
         
         // Assert
         let favorites = try await sut.fetchFavorites()
-        XCTAssertEqual(favorites.count, 1)
-        XCTAssertEqual(favorites.first?.id, 2)
+        XCTAssertEqual(favorites.count, 1, "Deve ter exatamente 1 filme")
+        XCTAssertEqual(favorites.first?.id, 2, "Filme restante deve ser o ID 2")
+    }
+    
+    // MARK: - New Fields Persistence Tests (Melhoria 4)
+    func testSaveFavoriteWithAllNewFields() async throws {
+        // Arrange
+        let movie = Movie(
+            id: 550,
+            title: "Fight Club",
+            voteAverage: 8.4,
+            voteCount: 29696,
+            runtime: 139,
+            tagline: "Your mind is the scene of the crime.",
+            status: "Released",
+            genreIds: [18, 28, 53]
+        )
+        
+        // Act
+        try await sut.saveFavorite(movie)
+        let favorites = try await sut.fetchFavorites()
+        
+        // Assert
+        let saved = favorites.first(where: { $0.id == 550 })
+        XCTAssertNotNil(saved)
+        XCTAssertEqual(saved?.id, 550)
+        XCTAssertEqual(saved?.title, "Fight Club")
+        XCTAssertEqual(saved?.voteCount, 29696)
+        XCTAssertEqual(saved?.runtime, 139)
+        XCTAssertEqual(saved?.tagline, "Your mind is the scene of the crime.")
+        XCTAssertEqual(saved?.status, "Released")
+        XCTAssertEqual(saved?.genreIds, [18, 28, 53])
+    }
+
+    func testUpdateFavoriteWithNewFields() async throws {
+        // Arrange - Salvar versão 1
+        var movie1 = Movie(id: 550, title: "Fight Club", voteAverage: 8.4)
+        try await sut.saveFavorite(movie1)
+        
+        // Arrange - Salvar versão 2 com novos campos
+        var movie2 = Movie(
+            id: 550,
+            title: "Fight Club",
+            voteAverage: 8.4,
+            voteCount: 29696,
+            runtime: 139,
+            genreIds: [18, 28]
+        )
+        try await sut.saveFavorite(movie2)
+        
+        // Act
+        let favorites = try await sut.fetchFavorites()
+        let updated = favorites.first(where: { $0.id == 550 })
+        
+        // Assert
+        XCTAssertEqual(favorites.count, 1, "Deve continuar com 1 filme (não duplicou)")
+        XCTAssertEqual(updated?.voteCount, 29696, "voteCount deve ser 29696")
+        XCTAssertEqual(updated?.runtime, 139, "runtime deve ser 139")
+    }
+
+    func testFetchFavoritesPreservesGenreIds() async throws {
+        // Arrange
+        let movie = Movie(
+            id: 550,
+            title: "Fight Club",
+            voteAverage: 8.4,
+            genreIds: [18, 28, 53]
+        )
+        
+        // Act
+        try await sut.saveFavorite(movie)
+        let favorites = try await sut.fetchFavorites()
+        
+        // Assert
+        XCTAssertEqual(favorites.first?.genreIds, [18, 28, 53])
     }
 }

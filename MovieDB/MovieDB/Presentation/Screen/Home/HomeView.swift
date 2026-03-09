@@ -22,10 +22,8 @@ struct HomeView: View {
                         error.retryAction?()
                     })
                 } else if viewModel.movies.isEmpty && !viewModel.searchText.isEmpty {
-                    // Busca vazia - mostrar SearchBar + botão
                     VStack(spacing: 0) {
                         SearchBar(text: $viewModel.searchText, onClear: {
-                            // Callback quando clica no "x"
                             Task {
                                 await viewModel.loadPopularMovies()
                             }
@@ -37,7 +35,8 @@ struct HomeView: View {
                                 }
                             }
                         }
-                            .padding(.vertical, 8)
+                        .accessibilityIdentifier("searchBar")
+                        .padding(.vertical, 8)
                         
                         ScrollView {
                             VStack(spacing: 20) {
@@ -97,6 +96,7 @@ struct HomeView: View {
                         await viewModel.searchMovies(query: newValue)
                     }
                 }
+                .accessibilityIdentifier("searchBar")
             
             VStack(spacing: 8) {
                 HStack {
@@ -104,6 +104,7 @@ struct HomeView: View {
                         .foregroundColor(.yellow)
                     
                     Slider(value: $viewModel.minRating, in: 0...10, step: 0.5)
+                        .accessibilityIdentifier("ratingSlider")
                     
                     Text(String(format: "%.1f", viewModel.minRating))
                         .font(.caption)
@@ -111,6 +112,11 @@ struct HomeView: View {
                         .frame(width: 35)
                 }
                 .padding(.horizontal)
+                
+                Button(action: {}) {
+                    Image(systemName: "line.3.horizontal.decrease")
+                }
+                .accessibilityIdentifier("filterButton")
                 
                 Text("Mostrando \(viewModel.filteredMovies.count) de \(viewModel.movies.count) filmes")
                     .font(.caption2)
@@ -149,6 +155,7 @@ struct HomeView: View {
                             .foregroundColor(.primary)
                             .cornerRadius(8)
                         }
+                        .accessibilityIdentifier("loadMoreButton")
                         .padding()
                     } else {
                         HStack {
@@ -164,6 +171,7 @@ struct HomeView: View {
                 }
                 .padding()
             }
+            .accessibilityIdentifier("moviesTable")
         }
     }
 }
