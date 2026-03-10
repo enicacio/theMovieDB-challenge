@@ -8,13 +8,9 @@
 import Foundation
 
 /// Utility namespace para formatação de dados de filmes
-/// Usa enum em vez de struct para namespace puro (sem instância)
 struct MovieFormatter {
     
     // MARK: - Genre Mapping
-    
-    /// Mapeamento de IDs de gênero para nomes em inglês
-    /// Reutilizável em qualquer lugar do app
     let genreMap: [Int: String] = [
         28: "Action",
         12: "Adventure",

@@ -22,7 +22,7 @@ struct SearchBar: View {
             if !text.isEmpty {
                 Button(action: {
                     text = ""
-                    onClear?()  // ← Chama o callback
+                    onClear?()
                 }) {
                     Image(systemName: "xmark.circle.fill")
                         .foregroundColor(.secondary)

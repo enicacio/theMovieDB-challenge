@@ -28,9 +28,9 @@ final class FavoritesRepository: FavoritesRepositoryProtocol {
         // Se existe, atualizar; se não, criar novo
         let entity: MovieEntity
         if let existing = results.first {
-            entity = existing  // ✅ ATUALIZAR registro existente
+            entity = existing
         } else {
-            entity = MovieEntity(context: container.viewContext)  // Criar novo
+            entity = MovieEntity(context: container.viewContext)
         }
         
         entity.id = Int32(exactly: movie.id) ?? 0
