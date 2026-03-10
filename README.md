@@ -1,120 +1,38 @@
-# 🎬 TheMovieDB iOS Challenge
+# TheMovieDB iOS Challenge
 
-Uma aplicação iOS moderna desenvolvida em **SwiftUI** que permite aos usuários explorar, buscar e gerenciar filmes do TheMovieDB API com uma arquitetura robusta e testes abrangentes.
-
----
-
-## ✨ Features
-
-### ✅ Principais Funcionalidades
-
-- **🎞️ Lista de Filmes Populares** - Exibe filmes populares em grid/lista scrollável
-- **🔍 Busca de Filmes** - Busca em tempo real por título de filme
-- **🎬 Detalhes do Filme** - Visualiza informações completas (sinopse, data de lançamento, rating, gêneros)
-- **❤️ Sistema de Favoritos** - Adicione/remova filmes favoritos com persistência via Core Data
-- **📊 Ratings e Avaliações** - Exibe nota de avaliação e votos do TMDB
-- **🎭 Gêneros** - Categorização de filmes por gênero
-- **⚡ Tratamento de Erros** - Feedback inteligente com ações de retry
-- **📱 Responsive Design** - Adapta-se a diferentes tamanhos de tela
-- **🧪 Testes Unitários** - +100 testes com 80%+ cobertura
+Uma aplicação iOS moderna desenvolvida em SwiftUI que permite aos usuários explorar, buscar e gerenciar filmes do TheMovieDB API com uma arquitetura robusta e testes abrangentes.
 
 ---
 
-## 📱 Screenshots
+## Funcionalidades
 
-<div align="center">
-  <h3>Tela Home com Busca</h3>
-  <img src="screenshot_home.png" width="300" alt="Home Screen" />
-  
-  <h3>Tela de Favoritos</h3>
-  <img src="screenshot_favorites.png" width="300" alt="Favorites Screen" />
-  
-  <h3>Tela de Detalhes</h3>
-    <img src="screenshot_detail.png" width="300" alt="Favorites Screen" />
-</div>
+### Principais Features
 
----
-
-## 🏗️ Arquitetura
-
-Implementada com padrão **MVVM** (Model-View-ViewModel) com **Dependency Injection** e **Protocol-based design**:
-
-```
-MovieDB/
-├── App/
-│   ├── MovieDBApp.swift           # Entry point
-│   └── Configuration.swift         # Constantes globais
-├── Domain/
-│   ├── Models/                     # Structs de domínio
-│   │   ├── Movie.swift
-│   │   ├── Genre.swift
-│   │   └── APIResponse.swift
-│   ├── Entities/
-│   │   └── NetworkError.swift      # Custom error enum
-│   └── Repositories/               # Protocols de repositório
-│       ├── MovieRepositoryProtocol.swift
-│       └── FavoritesRepositoryProtocol.swift
-├── Data/
-│   ├── Repositories/               # Implementações reais
-│   │   ├── MovieRepository.swift
-│   │   └── FavoritesRepository.swift
-│   ├── Services/APIService/        # Camada de API
-│   │   ├── APIServiceProtocol.swift
-│   │   ├── APIEndpoint.swift
-│   │   ├── APIClient.swift
-│   │   ├── APIService.swift
-│   │   └── MockAPIService.swift
-│   └── Persistence/                # Core Data
-│       ├── CoreDataStack.swift
-│       ├── MovieEntity+CoreDataClass.swift
-│       └── MovieEntity+CoreDataProperties.swift
-├── Presentation/
-│   ├── Screens/Home/               # HomeView com busca
-│   │   ├── HomeView.swift
-│   │   ├── HomeViewModel.swift
-│   │   └── Components/MovieListCell.swift
-│   ├── Screens/MovieDetail/        # Detalhes do filme
-│   │   ├── MovieDetailView.swift
-│   │   └── MovieDetailViewModel.swift
-│   ├── Screens/Favorites/          # Filmes favoritados
-│   │   ├── FavoritesView.swift
-│   │   └── FavoritesViewModel.swift
-│   ├── Common/Views/               # Componentes reutilizáveis
-│   │   ├── LoadingView.swift
-│   │   ├── ErrorView.swift
-│   │   ├── EmptyStateView.swift
-│   │   ├── CachedAsyncImage.swift
-│   │   └── SearchBar.swift
-│   └── App/AppView.swift           # Tab bar principal
-├── Utils/Logger/
-│   └── AppLogger.swift             # Logging com OSLog
-└── Tests/Unit/                     # 100+ testes unitários
-    ├── HomeViewModelTests.swift
-    ├── MovieDetailViewModelTests.swift
-    ├── FavoritesViewModelTests.swift
-    ├── MovieRepositoryTests.swift
-    ├── FavoritesRepositoryTests.swift
-    ├── NetworkErrorTests.swift
-    ├── MovieModelTests.swift
-    ├── GenreModelTests.swift
-    ├── APIEndpointTests.swift
-    └── APIResponseTests.swift
-```
+- Lista de Filmes Populares - Exibe filmes populares em grid/lista scrollável
+- Busca de Filmes - Busca em tempo real por título de filme com debounce
+- Detalhes do Filme - Visualiza informações completas (sinopse, data de lançamento, rating, gêneros)
+- Sistema de Favoritos - Adicione/remova filmes favoritos com persistência via Core Data
+- Compartilhamento de Imagem - Compartilhe a imagem do poster através dos apps nativos do iOS
+- Ratings e Avaliações - Exibe nota de avaliação e votos do TMDB
+- Categorização por Gêneros - Filmes categorizados por gênero
+- Tratamento de Erros - Feedback inteligente com ações de retry
+- Design Responsivo - Adapta-se a diferentes tamanhos de tela
+- Testes Unitários - 113+ testes com 80%+ cobertura
 
 ---
 
-## 🛠️ Requisitos
+## Requisitos do Sistema
 
-- **iOS 17.0+**
-- **Xcode 15.0+**
-- **Swift 5.5+**
-- **TheMovieDB API Key** (gratuita em [themoviedb.org](https://www.themoviedb.org/settings/api))
+- iOS 17.0 ou superior
+- Xcode 15.0 ou superior
+- Swift 5.5 ou superior
+- TheMovieDB API Key (gratuita em themoviedb.org)
 
 ---
 
-## 📦 Instalação
+## Guia de Execução
 
-### 1. Clonar Repositório
+### 1. Clonar o Repositório
 
 ```bash
 git clone https://github.com/seu-usuario/moviedb-ios.git
@@ -123,18 +41,18 @@ cd moviedb-ios
 
 ### 2. Obter API Key
 
-1. Acesse [TheMovieDB API](https://www.themoviedb.org/settings/api)
-2. Crie uma conta (gratuita)
+1. Acesse https://www.themoviedb.org/settings/api
+2. Crie uma conta gratuita
 3. Gere uma API Key (v3 auth)
-4. Copie a chave
+4. Copie a chave gerada
 
-### 3. Configurar API Key
+### 3. Configurar a API Key no Projeto
 
-**Arquivo:** `App/Configuration.swift`
+Abra o arquivo `MovieDB/App/Configuration.swift` e substitua `SUA_API_KEY_AQUI` pela sua chave:
 
 ```swift
 struct Configuration {
-    static let apiKey = "SUA_API_KEY_AQUI"  // ← Cole aqui
+    static let apiKey = "SEU_API_KEY_AQUI"  // Cole sua chave aqui
     static let baseURL = "https://api.themoviedb.org/3"
     static let imageBaseURL = "https://image.tmdb.org/t/p/w500"
     static let requestTimeout: TimeInterval = 30
@@ -142,204 +60,437 @@ struct Configuration {
 }
 ```
 
-### 4. Executar no Xcode
-
-```
-1. Abra MovieDB.xcodeproj no Xcode
-2. Selecione target "MovieDB"
-3. Escolha simulador (iPhone 15 ou posterior recomendado)
-4. Pressione Cmd + R (Run)
-```
-
----
-
-## 🎯 Como Usar
-
-### 📱 Na Aplicação
-
-#### **Home (Tab 1)**
-- Visualize filmes populares em grid
-- Use a barra de busca para encontrar filmes específicos
-- Toque em um filme para ver detalhes
-- Clique no ❤️ para adicionar aos favoritos
-
-#### **Detalhes do Filme**
-- Imagem de backdrop e poster
-- Título, sinopse e data de lançamento
-- Rating (⭐ 1-10) e votos totais
-- Gêneros categorizados
-- Botão ❤️ para alternar favoritos
-
-#### **Favoritos (Tab 2)**
-- Veja todos os filmes salvos
-- Deslize para remover da lista
-- Clique para visualizar detalhes novamente
-
----
-
-## 🧪 Testes
-
-### Executar Todos os Testes
+### 4. Abrir no Xcode
 
 ```bash
-Cmd + U  # No Xcode
+open MovieDB.xcodeproj
 ```
 
-### Cobertura de Código
+### 5. Executar a Aplicação
 
-Ativar relatório de cobertura:
-1. `Product` → `Scheme` → `Edit Scheme`
-2. `Test` → `Options`
-3. Marque `☑ Code Coverage`
-4. Execute `Cmd + U`
-5. Abra `Report Navigator` (`Cmd + 9`)
-6. Clique em "Test" → "Coverage"
+1. Selecione o simulador desejado (iPhone 15 ou posterior recomendado)
+2. Pressione Cmd + R (ou clique em Play)
+3. A aplicação será compilada e executada no simulador
 
-**Cobertura Atual:** 75%+ (18 classes testadas)
+### 6. Executar os Testes
+
+```bash
+# Executar todos os testes
+Cmd + U
+
+# Executar testes específicos
+Cmd + U (com o arquivo de testes selecionado)
+```
+
+---
+
+## Como Usar a Aplicação
+
+### Tela Home (Tab Inicial)
+
+1. Visualize filmes populares em layout grid
+2. Role para baixo para carregar mais filmes (paginação infinita)
+3. Use a barra de busca no topo para encontrar filmes específicos
+4. Toque em um filme para visualizar seus detalhes completos
+5. Clique no ícone de coração para adicionar/remover dos favoritos
+
+### Tela de Detalhes do Filme
+
+1. Visualize a imagem de backdrop do filme
+2. Clique no botão de compartilhamento (canto inferior direito) para compartilhar a imagem
+3. Escolha um app para compartilhar (iMessage, Email, WhatsApp, etc.)
+4. Veja informações completas do filme:
+   - Título e tagline
+   - Rating (estrelas) e votos totais
+   - Data de lançamento
+   - Duração do filme
+   - Status de produção
+   - Gêneros categorizados
+   - Sinopse completa
+5. Clique no ícone de coração para adicionar aos favoritos
+
+### Tela de Favoritos (Aba Secundária)
+
+1. Visualize todos os filmes salvos como favoritos
+2. Clique em um filme para ver seus detalhes novamente
+3. Deslize para a esquerda para remover um filme dos favoritos
+4. A lista persiste mesmo após fechar a aplicação (armazenada em Core Data)
+
+---
+
+## Arquitetura do Projeto
+
+### Estrutura de Pastas
+
+```
+MovieDB/
+├── App/
+│   ├── MovieDBApp.swift                # Entry point da aplicação
+│   └── Configuration.swift             # Configurações globais (API Key, URLs)
+│
+├── Domain/
+│   ├── Models/
+│   │   ├── Movie.swift                 # Modelo de Filme
+│   │   ├── Genre.swift                 # Modelo de Gênero
+│   │   └── APIResponse.swift           # Modelo de resposta da API
+│   ├── Protocols/
+│   │   ├── MovieRepositoryProtocol     # Interface para repositório de filmes
+│   │   ├── FavoritesRepositoryProtocol # Interface para repositório de favoritos
+│   │   └── LoggerProtocol              # Interface para logging
+│   └── Errors/
+│       └── NetworkError.swift          # Erros de rede customizados
+│
+├── Data/
+│   ├── Repositories/
+│   │   ├── MovieRepository.swift       # Implementação do repositório de filmes
+│   │   ├── FavoritesRepository.swift   # Implementação do repositório de favoritos
+│   │   └── MockMovieRepository.swift   # Mock para testes
+│   ├── Services/
+│   │   ├── ShareService.swift          # Serviço de compartilhamento de imagens
+│   │   ├── APIService.swift            # Serviço de requisições HTTP
+│   │   ├── APIEndpoint.swift           # Definição dos endpoints da API
+│   │   └── CoreDataStack.swift         # Configuração do Core Data
+│   ├── DTOs/
+│   │   └── MovieAPIResponse.swift      # Data Transfer Objects da API
+│   └── CoreData/
+│       ├── TheMovieDB.xcdatamodeld     # Esquema do Core Data
+│       └── MovieEntity+Extensions      # Extensões da entidade Core Data
+│
+├── Application/
+│   └── ViewModels/
+│       ├── HomeViewModel.swift         # ViewModel da tela Home
+│       ├── MovieDetailViewModel.swift  # ViewModel de detalhes do filme
+│       └── FavoritesViewModel.swift    # ViewModel de favoritos
+│
+├── Presentation/
+│   ├── Views/
+│   │   ├── HomeView.swift              # Tela principal com busca e grid
+│   │   ├── MovieDetailView.swift       # Tela de detalhes do filme
+│   │   ├── FavoritesView.swift         # Tela de filmes favoritos
+│   │   └── AppView.swift               # Tab bar principal
+│   ├── Components/
+│   │   ├── MovieListCell.swift         # Célula de filme na lista
+│   │   ├── LoadingView.swift           # View de carregamento
+│   │   ├── ErrorView.swift             # View de erro com retry
+│   │   ├── EmptyStateView.swift        # View de estado vazio
+│   │   ├── CachedAsyncImage.swift      # AsyncImage com cache
+│   │   └── SearchBar.swift             # Barra de busca customizada
+│   └── Modifiers/
+│       └── CustomModifiers.swift       # Modificadores reutilizáveis
+│
+├── Utilities/
+│   ├── Logger.swift                    # Sistema de logging
+│   ├── Formatters.swift                # Formatadores de dados
+│   └── Extensions.swift                # Extensões úteis
+│
+└── Tests/
+    ├── HomeViewModelTests.swift        # Testes da Home
+    ├── MovieDetailViewModelTests.swift # Testes de detalhes
+    ├── FavoritesViewModelTests.swift   # Testes de favoritos
+    ├── MovieRepositoryTests.swift      # Testes do repositório
+    ├── FavoritesRepositoryTests.swift  # Testes de persistência
+    ├── ShareServiceTests.swift         # Testes de compartilhamento
+    ├── NetworkErrorTests.swift         # Testes de erros
+    └── Mocks/
+        ├── MockMovieRepository.swift
+        ├── MockFavoritesRepository.swift
+        └── MockLogger.swift
+```
+
+### Padrão de Arquitetura
+
+O projeto implementa MVVM (Model-View-ViewModel) com Clean Architecture em 4 camadas:
+
+1. Domain Layer - Modelos, Protocolos e Erros (sem dependências)
+2. Data Layer - Repositórios, Serviços e Persistência
+3. Application Layer - ViewModels que orquestram a lógica
+4. Presentation Layer - Views e Components (apenas UI)
+
+---
+
+## Descrição Detalhada dos Métodos Principais
+
+### MovieDetailViewModel.shareMovie()
+
+Prepara os dados necessários para compartilhamento e exibe o menu nativo do iOS.
+
+```swift
+func shareMovie()
+```
+
+Fluxo:
+1. Obtém a URL do backdrop do filme
+2. Chama ShareService para preparar o arquivo de imagem
+3. Se sucesso: exibe o UIActivityViewController nativo
+4. Se erro: exibe a view de erro com opção de retry
+
+Parâmetros: Nenhum (usa dados do filme carregado no ViewModel)
+
+Retorno: Void (opera através de @Published properties)
+
+Estados afetados:
+- `shareItems: [Any]` - Arquivo JPEG pronto para compartilhar
+- `shareError: ErrorMessage?` - Erro se houver falha
+- `showShare: Bool` - Controla exibição da sheet
+
+### ShareService.prepareShareItems(backdropURL:)
+
+Recupera a imagem do cache do URLCache, salva em arquivo temporário e retorna para compartilhamento.
+
+```swift
+func prepareShareItems(backdropURL: URL) async throws -> [Any]
+```
+
+Parâmetros:
+- `backdropURL: URL` - URL da imagem já carregada e em cache
+
+Processo:
+1. Verifica se a imagem está em cache via URLCache
+2. Se não encontrar - lança `ShareServiceError.imageNotInCache`
+3. Se encontrar - salva os dados JPEG em arquivo temporário
+4. Retorna array contendo o arquivo JPEG
+
+Lançamentos:
+- `ShareServiceError.imageNotInCache` - Imagem não disponível em cache
+- `ShareServiceError.failedToWriteFile` - Erro ao salvar arquivo
+
+### HomeViewModel.searchMovies(query:)
+
+Realiza busca de filmes com debounce automático.
+
+```swift
+func searchMovies(query: String)
+```
+
+Parâmetros:
+- `query: String` - Termo de busca digitado pelo usuário
+
+Comportamento:
+1. Se query está vazio - recarrega filmes populares
+2. Se query tem texto - aguarda 0.5 segundos (debounce)
+3. Após debounce - faz requisição de busca
+4. Atualiza lista de filmes na tela
+
+Estados afetados:
+- `movies: [Movie]` - Lista de filmes retornados
+- `isLoading: Bool` - Indica carregamento
+- `error: ErrorMessage?` - Erros da busca
+
+### FavoritesRepository.saveFavorite(movie:)
+
+Persiste um filme nos favoritos usando Core Data.
+
+```swift
+func saveFavorite(movie: Movie) async throws
+```
+
+Parâmetros:
+- `movie: Movie` - Filme a ser adicionado aos favoritos
+
+Processo:
+1. Cria uma entidade MovieEntity no Core Data
+2. Mapeia propriedades de Movie para MovieEntity
+3. Salva o contexto do Core Data
+4. Se erro - propaga exceção
+
+Lançamentos:
+- NSError (Core Data) - Se falhar ao salvar
+
+---
+
+## Premissas e Decisões Técnicas
+
+### 1. API Cache com URLCache
+
+**Premissa:** As imagens dos filmes já estão em cache quando o usuário tenta compartilhar.
+
+**Razão:** A AsyncImage que exibe o backdrop automaticamente cacheia a imagem via URLCache. Reutilizar este cache evita uma segunda requisição de rede desnecessária, tornando o compartilhamento instantâneo.
+
+**Alternativa considerada:** Baixar a imagem novamente via URLSession. Rejeitada por:
+- Gasta dados do usuário
+- Adiciona latência (1-2 segundos)
+- Risco de falha de rede
+
+### 2. Uso de @MainActor para Thread Safety
+
+**Premissa:** Todas operações de UI devem acontecer na main thread.
+
+**Razão:** SwiftUI obriga `@Published` properties a serem atualizadas na main thread. Usar `@MainActor` no ViewModel garante que todas as atualizações sejam thread-safe.
+
+**Alternativa considerada:** Chamar `DispatchQueue.main.async` manualmente. Rejeitada por:
+- Menos legível que `@MainActor`
+- Mais propenso a erros
+- Swift concurrency é o padrão moderno
+
+### 3. ErrorMessage Reutilizável
+
+**Premissa:** Erros de compartilhamento usam a mesma estrutura ErrorMessage do resto da app.
+
+**Razão:** Maximiza reutilização de código. O ErrorView já implementado mostra erros de forma consistente.
+
+**Benefício:** Mesmo visual e comportamento em toda a aplicação (botão "Try Again", layout, etc).
+
+### 4. Debounce em Busca (0.5 segundos)
+
+**Premissa:** Busca aguarda 0.5 segundos após o usuário parar de digitar.
+
+**Razão:**
+- Reduz requisições desnecessárias
+- Melhora performance
+- Padrão UX esperado
+
+**Ajuste:** Pode ser modificado em `HomeViewModel` se necessário.
+
+### 5. Paginação de Filmes
+
+**Premissa:** Filmes são carregados em grupos de 20.
+
+**Razão:**
+- API do TMDB retorna 20 por padrão
+- Reduz tamanho de resposta
+- Melhora tempo de carregamento inicial
+- Suporta scroll infinito
+
+### 6. Core Data para Persistência de Favoritos
+
+**Premissa:** Usar Core Data em vez de UserDefaults ou Realm.
+
+**Razão:**
+- Native do iOS (sem dependências externas)
+- Ideal para dados estruturados (filmes com múltiplas propriedades)
+- Suporta sync automático com CloudKit (futuro)
+- Melhor performance para grandes volumes
+
+**Alternativa considerada:** Realm. Rejeitada por adicionar dependência externa.
+
+### 7. OSLog Injetável
+
+**Premissa:** Logging via protocol em vez de classe static.
+
+**Razão:**
+- Permite mock em testes
+- Desacoplamento
+- Testabilidade
+
+**Benefício:** Testes não produzem logs indesejados.
+
+---
+
+## Testes
 
 ### Estrutura de Testes
 
-Cada test segue o padrão **AAA**:
+O projeto contém 113+ testes unitários organizados por feature:
+
+- HomeViewModel: 18 testes
+- MovieDetailViewModel: 8 testes  
+- FavoritesViewModel: 7 testes
+- MovieRepository: 9 testes
+- FavoritesRepository: 10 testes
+- ShareService: 8 testes
+- NetworkError: 20 testes
+- Models: 18+ testes
+
+### Executar Testes
+
+```bash
+# Todos os testes
+Cmd + U
+
+# Testes de cobertura
+Product > Scheme > Edit Scheme > Test > Options > Code Coverage
+```
+
+Cobertura esperada: 88%+
+
+### Padrão AAA em Testes
+
+Cada teste segue:
 
 ```swift
 func testExample() async {
     // Arrange - Preparar dados
-    let mockData = Movie(...)
+    let viewModel = HomeViewModel(repository: mockRepository)
     
     // Act - Executar ação
     await viewModel.loadMovies()
     
     // Assert - Verificar resultado
     XCTAssertEqual(viewModel.movies.count, 1)
-}
-```
-
-**Classes de Testes:**
-- ✅ HomeViewModelTests (18 testes)
-- ✅ MovieDetailViewModelTests (8 testes)
-- ✅ FavoritesViewModelTests (7 testes)
-- ✅ MovieRepositoryTests (9 testes)
-- ✅ FavoritesRepositoryTests (10 testes)
-- ✅ NetworkErrorTests (20 testes)
-- ✅ MovieModelTests (18 testes)
-- ✅ GenreModelTests (13 testes)
-- ✅ APIEndpointTests (13 testes)
-- ✅ APIResponseTests (17 testes)
-
----
-
-## 🏛️ Padrões e Decisões Técnicas
-
-### MVVM + Clean Architecture
-
-```
-Domain Layer (Models, Protocols)
-    ↓
-Data Layer (Repositories, Services)
-    ↓
-Presentation Layer (Views, ViewModels)
-```
-
-### Protocol-Based Design
-
-```swift
-protocol MovieRepositoryProtocol {
-    func fetchPopularMovies(page: Int) async throws -> [Movie]
-    func searchMovies(query: String, page: Int) async throws -> [Movie]
-}
-```
-
-### Error Handling Customizado
-
-```swift
-enum NetworkError: LocalizedError, Equatable {
-    case networkUnavailable
-    case timedOut
-    case serverError(statusCode: Int)
-    case decodingError(details: String? = nil)
-}
-```
-
-### Async/Await
-
-Toda operação assíncrona usa `async/await`:
-
-```swift
-@MainActor
-func loadMovies() async {
-    do {
-        let movies = try await movieRepository.fetchPopularMovies(page: 1)
-        self.movies = movies
-    } catch {
-        self.error = ErrorMessage(message: error.localizedDescription)
-    }
-}
-```
-
-### Core Data para Persistência
-
-Favoritos são salvos localmente via Core Data:
-
-```swift
-// MovieEntity representa a tabela do banco de dados
-// Sincronismo automático com View via @FetchRequest
-```
-
-### Logging Profissional
-
-OSLog injectable (não static):
-
-```swift
-protocol LoggerProtocol {
-    func logAPIRequest(method: String, endpoint: String)
-    func logAPIError(_ error: Error, context: String)
+    XCTAssertFalse(viewModel.isLoading)
 }
 ```
 
 ---
 
-## 📊 Performance
+## Dependências
 
-### Otimizações Implementadas
+### Internas (sem CocoaPods)
 
-- **Image Caching** - NSCache para postersPNG/JPG
-- **Lazy Loading** - LazyVStack com scroll infinito
-- **Pagination** - Carrega filmes em grupos de 20
-- **Debouncing** - Busca aguarda 0.5s após digitação
-- **Compilação AoT** - SwiftUI compila previamente componentes
+- SwiftUI - UI Framework
+- Combine - Reactive programming
+- Core Data - Persistência local
+- URLSession - Requisições HTTP
+- OSLog - Logging
 
----
+### Não há dependências externas
 
-## 📝 Licença
-
-Este projeto foi desenvolvido para fins educacionais.
+O projeto foi desenvolvido com apenas frameworks nativos do iOS.
 
 ---
 
-## 👨‍💻 Desenvolvedor
+## Performance e Otimizações
 
-**Eliane Regina Nicácio Mendes**
+### Image Caching
 
-- GitHub: [@enicacio](https://github.com/enicacio)
-- Email: eliane.nic@gmail.com
+- AsyncImage + URLCache para imagens da API
+- Cache automático via URLSession
+- Evita re-download em navegação
+
+### Lazy Loading
+
+- LazyVStack em listas
+- Carregamento incremental de filmes
+- Pagination infinita
+
+### Search Debouncing
+
+- Aguarda 0.5s após digitação
+- Reduz requisições desnecessárias
+- Melhor UX e performance
+
+### Decodificação Assíncrona
+
+- JSONDecoder em thread background
+- Não bloqueia UI durante parsing
 
 ---
 
-## 📚 Recursos Adicionais
+## Licença
+
+Desenvolvido para fins educacionais.
+
+---
+
+## Desenvolvedor
+
+Eliane Regina Nicácio Mendes
+
+---
+
+## Recursos Adicionais
 
 ### Documentação Oficial
-- [SwiftUI Documentation](https://developer.apple.com/xcode/swiftui/)
-- [The Movie Database API](https://www.themoviedb.org/settings/api)
-- [Swift Concurrency](https://swift.org/concurrency/)
-- [Core Data Guide](https://developer.apple.com/documentation/coredata)
 
-### Padrões de Arquitetura
-- [MVVM Pattern](https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93viewmodel)
-- [Dependency Injection](https://en.wikipedia.org/wiki/Dependency_injection)
-- [Protocol-Oriented Programming](https://developer.apple.com/videos/play/wwdc2015/408/)
+- SwiftUI Documentation: https://developer.apple.com/xcode/swiftui/
+- TheMovieDB API: https://www.themoviedb.org/settings/api
+- Swift Concurrency: https://swift.org/concurrency/
+- Core Data Guide: https://developer.apple.com/documentation/coredata
 
----
+### Padrões Implementados
 
-**⭐ Se achou útil, considere dar uma star no GitHub!**
-
-Feito com ❤️ em SwiftUI
+- MVVM (Model-View-ViewModel)
+- Clean Architecture
+- Dependency Injection
+- Protocol-Oriented Programming
+- Repository Pattern
