@@ -472,9 +472,9 @@ Eliane Regina Nicácio Mendes
 
 ### Documentação Oficial
 
-- SwiftUI Documentation: https://developer.apple.com/xcode/swiftui/
+- SwiftUI Documentation: https://developer.apple.com/swiftui/
 - TheMovieDB API: https://www.themoviedb.org/settings/api
-- Swift Concurrency: https://swift.org/concurrency/
+- Swift Concurrency: https://developer.apple.com/videos/play/wwdc2025/268/
 - Core Data Guide: https://developer.apple.com/documentation/coredata
 
 ### Padrões Implementados
