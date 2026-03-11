@@ -10,6 +10,8 @@ import SwiftUI
 struct MovieDetailView: View {
     let movieId: Int
     @StateObject private var viewModel: MovieDetailViewModel
+    @State private var showShare = false
+    @State private var shareItems: [Any] = []
     let formatter = MovieFormatter()
     
     init(movieId: Int) {
@@ -33,10 +35,47 @@ struct MovieDetailView: View {
                 ScrollView {
                     VStack(alignment: .leading, spacing: 0) {
                         // Backdrop
-                        CachedAsyncImage(url: movie.backdropURL)
-                            .scaledToFill()
-                            .frame(maxWidth: .infinity, minHeight: 200)
-                            .clipped()
+                        ZStack(alignment: .bottomTrailing) {
+                            CachedAsyncImage(url: movie.backdropURL)
+                                .scaledToFill()
+                                .frame(maxWidth: .infinity, minHeight: 200)
+                                .clipped()
+                            
+                            Button(action: {
+                                Task {
+                                    if let url = movie.backdropURL,
+                                       let cachedResponse = URLCache.shared.cachedResponse(for: URLRequest(url: url)) {
+                                        
+                                        // JPEG bruto do cache (não decodifica!)
+                                        let imageData = cachedResponse.data
+                                        
+                                        // Salvar em arquivo temporário
+                                        let tempFile = FileManager.default.temporaryDirectory
+                                            .appendingPathComponent("poster_\(UUID().uuidString).jpg")
+                                        
+                                        do {
+                                            try imageData.write(to: tempFile)
+                                            
+                                            await MainActor.run {
+                                                shareItems = [tempFile]
+                                                showShare = true
+                                            }
+                                        } catch {
+                                            print("Erro ao salvar: \(error)")
+                                        }
+                                    }
+                                }
+                            }) {
+                                Image(systemName: "square.and.arrow.up")
+                                    .font(.system(size: 16, weight: .semibold))
+                                    .foregroundColor(.white)
+                                    .frame(width: 44, height: 44)
+                                    .background(Color.black.opacity(0.6))
+                                    .clipShape(Circle())
+                            }
+
+                            .padding(12)
+                        }
                         
                         // Content
                         VStack(alignment: .leading, spacing: 16) {
@@ -204,6 +243,10 @@ struct MovieDetailView: View {
         .navigationBarTitleDisplayMode(.inline)
         .task {
             await viewModel.loadMovieDetails()
+        }
+        
+        .sheet(isPresented: $showShare) {
+            ShareSheetView(items: shareItems)
         }
     }
 }
