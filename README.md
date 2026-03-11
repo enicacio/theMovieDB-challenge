@@ -16,8 +16,6 @@ Uma aplicação iOS moderna desenvolvida em SwiftUI que permite aos usuários ex
 - Ratings e Avaliações - Exibe nota de avaliação e votos do TMDB
 - Categorização por Gêneros - Filmes categorizados por gênero
 - Tratamento de Erros - Feedback inteligente com ações de retry
-- Design Responsivo - Adapta-se a diferentes tamanhos de tela
-- Testes Unitários - 113+ testes com 80%+ cobertura
 
 ---
 
@@ -68,7 +66,7 @@ open MovieDB.xcodeproj
 
 ### 5. Executar a Aplicação
 
-1. Selecione o simulador desejado (iPhone 15 ou posterior recomendado)
+1. Selecione o simulador desejado
 2. Pressione Cmd + R (ou clique em Play)
 3. A aplicação será compilada e executada no simulador
 
@@ -93,13 +91,13 @@ Cmd + U (com o arquivo de testes selecionado)
 3. Use a barra de busca no topo para encontrar filmes específicos
 4. Toque em um filme para visualizar seus detalhes completos
 5. Clique no ícone de coração para adicionar/remover dos favoritos
+6. Filtre filmes pela sua classificação (Rating)
 
 ### Tela de Detalhes do Filme
 
 1. Visualize a imagem de backdrop do filme
-2. Clique no botão de compartilhamento (canto inferior direito) para compartilhar a imagem
-3. Escolha um app para compartilhar (iMessage, Email, WhatsApp, etc.)
-4. Veja informações completas do filme:
+2. Clique no botão de compartilhamento para compartilhar a imagem
+3. Veja informações completas do filme:
    - Título e tagline
    - Rating (estrelas) e votos totais
    - Data de lançamento
@@ -113,8 +111,7 @@ Cmd + U (com o arquivo de testes selecionado)
 
 1. Visualize todos os filmes salvos como favoritos
 2. Clique em um filme para ver seus detalhes novamente
-3. Deslize para a esquerda para remover um filme dos favoritos
-4. A lista persiste mesmo após fechar a aplicação (armazenada em Core Data)
+3. A lista persiste mesmo após fechar a aplicação (armazenada em Core Data)
 
 ---
 
@@ -210,49 +207,42 @@ O projeto implementa MVVM (Model-View-ViewModel) com Clean Architecture em 4 cam
 
 ## Descrição Detalhada dos Métodos Principais
 
-### MovieDetailViewModel.shareMovie()
+### HomeViewModel.loadPopularMovies()
 
-Prepara os dados necessários para compartilhamento e exibe o menu nativo do iOS.
-
-```swift
-func shareMovie()
-```
-
-Fluxo:
-1. Obtém a URL do backdrop do filme
-2. Chama ShareService para preparar o arquivo de imagem
-3. Se sucesso: exibe o UIActivityViewController nativo
-4. Se erro: exibe a view de erro com opção de retry
-
-Parâmetros: Nenhum (usa dados do filme carregado no ViewModel)
-
-Retorno: Void (opera através de @Published properties)
-
-Estados afetados:
-- `shareItems: [Any]` - Arquivo JPEG pronto para compartilhar
-- `shareError: ErrorMessage?` - Erro se houver falha
-- `showShare: Bool` - Controla exibição da sheet
-
-### ShareService.prepareShareItems(backdropURL:)
-
-Recupera a imagem do cache do URLCache, salva em arquivo temporário e retorna para compartilhamento.
+Carrega filmes populares da API TMDB com suporte a paginação infinita.
 
 ```swift
-func prepareShareItems(backdropURL: URL) async throws -> [Any]
+func loadPopularMovies(page: Int = 1)
 ```
 
 Parâmetros:
-- `backdropURL: URL` - URL da imagem já carregada e em cache
+- `page: Int` - Número da página de filmes a carregar (padrão: 1)
 
-Processo:
-1. Verifica se a imagem está em cache via URLCache
-2. Se não encontrar - lança `ShareServiceError.imageNotInCache`
-3. Se encontrar - salva os dados JPEG em arquivo temporário
-4. Retorna array contendo o arquivo JPEG
+Comportamento:
+1. Define `isLoading = true` para mostrar indicador de carregamento
+2. Faz requisição à API TMDB para buscar filmes populares
+3. Se é primeira página - substitui lista existente
+4. Se é página seguinte - adiciona à lista existente (paginação infinita)
+5. Define `isLoading = false` ao completar
+6. Se erro - captura exceção e popula `error` property
+
+Estados afetados:
+- `movies: [Movie]` - Lista de filmes populares retornados
+- `isLoading: Bool` - Indica se está carregando
+- `error: ErrorMessage?` - Mensagem de erro (se houver)
+- `currentPage: Int` - Página atual para paginação
 
 Lançamentos:
-- `ShareServiceError.imageNotInCache` - Imagem não disponível em cache
-- `ShareServiceError.failedToWriteFile` - Erro ao salvar arquivo
+- `NetworkError.networkUnavailable` - Sem conexão com internet
+- `NetworkError.timedOut` - Timeout na requisição
+- `NetworkError.serverError` - Erro 5xx do servidor
+- `NetworkError.decodingError` - Erro ao decodificar resposta JSON
+
+Exemplo de uso:
+```swift
+await viewModel.loadPopularMovies()        // Primeira página
+await viewModel.loadPopularMovies(page: 2) // Segunda página (paginação)
+```
 
 ### HomeViewModel.searchMovies(query:)
 
