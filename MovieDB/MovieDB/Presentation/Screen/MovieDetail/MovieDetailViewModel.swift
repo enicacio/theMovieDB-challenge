@@ -14,11 +14,14 @@ final class MovieDetailViewModel: ObservableObject {
     @Published var isLoading = false
     @Published var error: ErrorMessage?
     @Published var isFavorite = false
+    @Published var shareItems: [Any] = []
+    @Published var showShare = false
     
     // MARK: - Private Properties
     private let movieRepository: MovieRepositoryProtocol
     private let favoritesRepository: FavoritesRepositoryProtocol
     private let movieId: Int
+    private var tempShareFile: URL?
     
     // MARK: - Initialization
     init(
@@ -40,6 +43,10 @@ final class MovieDetailViewModel: ObservableObject {
             movie = try await movieRepository.fetchMovieDetails(id: movieId)
             isFavorite = try await favoritesRepository.isFavorite(movieId: movieId)
             isLoading = false
+            
+            // Preparar arquivo de compartilhamento enquanto carrega
+            await prepareShareFile()
+            
         } catch let networkError as NetworkError {
             handleError(networkError, context: "LoadMovieDetails") {
                 Task { await self.loadMovieDetails() }
@@ -84,7 +91,38 @@ final class MovieDetailViewModel: ObservableObject {
         }
     }
     
+    /// Ação para compartilhar o filme
+    /// Executa instantaneamente pois arquivo já foi preparado em loadMovieDetails
+    func shareMovie() {
+        if let tempFile = tempShareFile {
+            shareItems = [tempFile]
+            showShare = true
+        }
+    }
+    
     // MARK: - Private Methods
+    
+    /// Prepara arquivo de compartilhamento em background
+    /// Chamado automaticamente após loadMovieDetails completar
+    private func prepareShareFile() async {
+        guard let movie = movie,
+              let url = movie.backdropURL,
+              let cachedResponse = URLCache.shared.cachedResponse(for: URLRequest(url: url)) else {
+            return
+        }
+        
+        let imageData = cachedResponse.data
+        let tempFile = FileManager.default.temporaryDirectory
+            .appendingPathComponent("poster_\(UUID().uuidString).jpg")
+        
+        do {
+            try imageData.write(to: tempFile)
+            self.tempShareFile = tempFile
+        } catch {
+            AppLogger().logAPIError(NetworkError.unknown, context: "PrepareShareFile")
+        }
+    }
+    
     private func handleError(
         _ error: NetworkError,
         context: String,
