@@ -19,6 +19,22 @@ Uma aplicação iOS moderna desenvolvida em SwiftUI que permite aos usuários ex
 
 ---
 
+## Screenshots
+
+<div align="center">
+
+| Home com Busca | Filtros Avançados |
+|:---:|:---:|
+| <img src="screenshot_home.png" width="280" alt="Home Screen" /> | <img src="screenshot_filter.png" width="280" alt="Filter Screen" /> |
+| Exibe filmes populares com busca em tempo real e paginação infinita | Filtra por Rating, Gêneros e Data de Lançamento |
+
+| Detalhes do Filme | Filmes Favoritos |
+|:---:|:---:|
+| <img src="screenshot_detail.png" width="280" alt="Detail Screen" /> | <img src="screenshot_favorites.png" width="280" alt="Favorites Screen" /> |
+| Visualiza informações completas e compartilha imagens | Gerencia filmes salvos com persistência via Core Data |
+
+</div>
+
 ## Requisitos do Sistema
 
 - iOS 17.0 ou superior
