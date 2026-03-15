@@ -23,11 +23,16 @@ final class HomeViewModel: ObservableObject {
     @Published var searchText = ""
     @Published var currentPage = 1
     @Published var isLoadingMore = false
-    @Published var minRating: Double = 0.0
+    
+    // MARK: - Filter Properties
+    @Published var filterCriteria = FilterCriteria()
+    @Published var showFilterSheet = false
     
     // MARK: - Computed property
     var filteredMovies: [Movie] {
-        movies.filter { $0.voteAverage >= minRating }
+        movies.filter { movie in
+            applyFilters(to: movie)
+        }
     }
     
     // MARK: - Private Properties
@@ -43,7 +48,81 @@ final class HomeViewModel: ObservableObject {
         self.favoritesRepository = favoritesRepository
     }
     
-    // MARK: - Public Methods
+    // MARK: - Filter Methods
+    
+    /// Aplica todos os filtros a um filme
+    private func applyFilters(to movie: Movie) -> Bool {
+        // Filter 1: Rating
+        if movie.voteAverage < filterCriteria.minRating {
+            return false
+        }
+        
+        // Filter 2: Gêneros
+        if !filterCriteria.selectedGenres.isEmpty {
+            let hasGenre = movie.genreIds.contains { id in
+                filterCriteria.selectedGenres.contains(id)
+            }
+            if !hasGenre {
+                return false
+            }
+        }
+        
+        // Filter 3: Release Date
+        if let startDate = filterCriteria.startDate,
+           let releaseDate = movie.releaseDateAsDate,
+           releaseDate < startDate {
+            return false
+        }
+        
+        if let endDate = filterCriteria.endDate,
+           let releaseDate = movie.releaseDateAsDate,
+           releaseDate > endDate {
+            return false
+        }
+        
+        return true
+    }
+    
+    /// Toggle gênero na seleção
+    func toggleGenre(_ genre: MovieGenre) {
+        if filterCriteria.selectedGenres.contains(genre.rawValue) {
+            filterCriteria.selectedGenres.remove(genre.rawValue)
+        } else {
+            filterCriteria.selectedGenres.insert(genre.rawValue)
+        }
+    }
+    
+    /// Reset todos os filtros
+    func resetFilters() {
+        filterCriteria.reset()
+    }
+    
+    /// Check se há filtros ativos
+    var hasActiveFilters: Bool {
+        !filterCriteria.isEmpty
+    }
+    
+    /// Contagem de filtros ativos
+    var activeFilterCount: Int {
+        var count = 0
+        
+        if filterCriteria.minRating > 0 {
+            count += 1
+        }
+        
+        if !filterCriteria.selectedGenres.isEmpty {
+            count += 1
+        }
+        
+        if filterCriteria.startDate != nil || filterCriteria.endDate != nil {
+            count += 1
+        }
+        
+        return count
+    }
+    
+    // MARK: - Existing Methods (keep as is)
+    
     func loadPopularMovies() async {
         isLoading = true
         error = nil
@@ -98,14 +177,6 @@ final class HomeViewModel: ObservableObject {
             } else {
                 try await favoritesRepository.saveFavorite(movie)
             }
-        } catch let networkError as NetworkError {
-            let errorMsg = ErrorMessage(
-                message: "Failed to update favorite",
-                retryAction: {
-                    Task { await self.toggleFavorite(movie: movie) }
-                }
-            )
-            self.error = errorMsg
         } catch {
             let errorMsg = ErrorMessage(
                 message: "Failed to update favorite",
@@ -125,7 +196,7 @@ final class HomeViewModel: ObservableObject {
             let newMovies = try await movieRepository.fetchPopularMovies(page: currentPage)
             self.movies.append(contentsOf: newMovies)
         } catch {
-            currentPage -= 1  // Volta se erro
+            currentPage -= 1
             let errorMsg = ErrorMessage(
                 message: "Erro ao carregar mais filmes",
                 retryAction: { [weak self] in
@@ -138,11 +209,8 @@ final class HomeViewModel: ObservableObject {
         isLoadingMore = false
     }
     
-    func setMinRating(_ rating: Double) {
-        minRating = rating
-    }
-    
     // MARK: - Private Methods
+    
     private func handleError(
         _ error: NetworkError,
         context: String,

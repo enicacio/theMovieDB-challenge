@@ -480,7 +480,7 @@ final class HomeViewModelTests: XCTestCase {
     
     // MARK: - Rating Filter Tests
     func testMinRatingInitializesAtZero() {
-        XCTAssertEqual(sut.minRating, 0.0)
+        XCTAssertEqual(sut.filterCriteria.minRating, 0.0)
     }
 
     func testFilteredMoviesReturnsAllWhenMinRatingZero() async {
@@ -508,7 +508,7 @@ final class HomeViewModelTests: XCTestCase {
         mockMovieRepository.mockError = nil
         await sut.loadPopularMovies()
         
-        sut.minRating = 7.0
+        sut.filterCriteria.minRating = 7.0
         
         XCTAssertEqual(sut.filteredMovies.count, 1)
         if let firstMovie = sut.filteredMovies.first {
@@ -529,7 +529,7 @@ final class HomeViewModelTests: XCTestCase {
         mockMovieRepository.mockError = nil
         await sut.loadPopularMovies()
         
-        sut.minRating = 8.5
+        sut.filterCriteria.minRating = 8.5
         
         XCTAssertEqual(sut.filteredMovies.count, 1)
         XCTAssertEqual(sut.filteredMovies.first?.id, 3)
@@ -546,7 +546,7 @@ final class HomeViewModelTests: XCTestCase {
         mockMovieRepository.mockError = nil
         await sut.loadPopularMovies()
         
-        sut.minRating = 9.0
+        sut.filterCriteria.minRating = 9.0
         
         XCTAssertTrue(sut.filteredMovies.isEmpty)
     }
@@ -568,7 +568,7 @@ final class HomeViewModelTests: XCTestCase {
         mockMovieRepository.mockError = nil
         await sut.loadMoreMovies()
         
-        sut.minRating = 7.5
+        sut.filterCriteria.minRating = 7.5
         
         XCTAssertEqual(sut.movies.count, 2)
         XCTAssertEqual(sut.filteredMovies.count, 1)

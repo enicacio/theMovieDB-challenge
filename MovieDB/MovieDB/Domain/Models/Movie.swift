@@ -125,3 +125,14 @@ struct Movie: Codable, Identifiable {
         try container.encode(genreIds, forKey: .genreIds)
     }
 }
+
+extension Movie {
+    /// Converte releaseDate string para Date
+    var releaseDateAsDate: Date? {
+        guard let dateString = releaseDate else { return nil }
+        
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd"
+        return formatter.date(from: dateString)
+    }
+}
